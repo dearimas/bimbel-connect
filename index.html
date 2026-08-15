@@ -3,10 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Pembayaran</title>
+
+    <title>Bimbel Connect - Login</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 380px;
+            margin: 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 7px;
+            background: #222;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            color: #c00;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Data Pembayaran</h1>
-    <p>Website berhasil online 🎉</p>
+
+<div class="login-box">
+
+    <h1>Bimbel Connect</h1>
+
+    <div class="subtitle">
+        Silakan login untuk melanjutkan
+    </div>
+
+    <form id="loginForm">
+
+        <label for="email">Email</label>
+        <input
+            type="email"
+            id="email"
+            placeholder="nama@email.com"
+            required
+        >
+
+        <label for="password">Password</label>
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+        >
+
+        <button type="submit" id="loginButton">
+            Login
+        </button>
+
+    </form>
+
+    <div id="message"></div>
+
+</div>
+
+<script>
+
+    const SUPABASE_URL = "https://ipnoshuvofomxwssamma.supabase.co";
+
+    const SUPABASE_KEY = "sb_publishable_Q95e9ofqnDyPhavmx8GLSA_Dr3rnuj5";
+
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+    // Kalau sudah login, langsung masuk dashboard
+    async function checkSession() {
+
+        const { data: { session } } =
+            await supabaseClient.auth.getSession();
+
+        if (session) {
+            window.location.href = "dashboard.html";
+        }
+    }
+
+
+    checkSession();
+
+
+    // Proses login
+    document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const password =
+                document.getElementById("password").value;
+
+            const button =
+                document.getElementById("loginButton");
+
+            const message =
+                document.getElementById("message");
+
+
+            button.disabled = true;
+            button.textContent = "Memproses...";
+
+            message.textContent = "";
+
+
+            const { data, error } =
+                await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+
+            if (error) {
+
+                message.textContent =
+                    "Login gagal: " + error.message;
+
+                button.disabled = false;
+                button.textContent = "Login";
+
+                return;
+            }
+
+
+            window.location.href = "dashboard.html";
+
+        });
+
+</script>
+
 </body>
 </html>
