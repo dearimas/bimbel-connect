@@ -904,14 +904,14 @@
             );
 
             document
-                .getElementById("staffName")
-                .textContent =
-                "User";
+    .getElementById("staffName")
+    .textContent =
+    staff.nama || "Staff";
 
-            document
-                .getElementById("staffDetail")
-                .textContent =
-                email;
+document
+    .getElementById("staffDetail")
+    .textContent =
+    `${staff.kode || "-"} · ${staff.email || email}`;
 
             return;
         }
