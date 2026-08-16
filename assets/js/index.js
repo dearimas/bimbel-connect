@@ -21,7 +21,7 @@ const SUPABASE_URL =
             if (session) {
 
                 window.location.href =
-                    "./";
+                    "dashboard.html";
 
             }
         }
