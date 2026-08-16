@@ -278,7 +278,15 @@ function parseDisplayDate(value) {
 
     }
 
-    const parts = value.trim().split("/");
+    const trimmed = value.trim();
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+
+        return trimmed;
+
+    }
+
+    const parts = trimmed.split("/");
 
     if (parts.length !== 3) {
 
@@ -312,8 +320,13 @@ function parseDisplayDate(value) {
 
 function setDefaultDate() {
 
-    tanggalInput.value =
-        formatDateToDisplay(new Date());
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    tanggalInput.value = `${year}-${month}-${day}`;
 
 }
 
