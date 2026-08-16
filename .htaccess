@@ -1,0 +1,11 @@
+DirectoryIndex dashboard.html
+
+RewriteEngine On
+
+# Tampilkan URL tanpa ekstensi untuk halaman pembayaran.
+RewriteCond %{THE_REQUEST} \s/+[^\s?]*/pembayaran\.html[\s?] [NC]
+RewriteRule ^pembayaran\.html$ pembayaran [R=302,L,NE]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^pembayaran/?$ pembayaran.html [L]
