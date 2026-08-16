@@ -243,26 +243,77 @@ function showMessage(
    DEFAULT DATE
 ===================================================== */
 
-function setDefaultDate() {
+function formatDateToDisplay(dateValue) {
 
-    const today =
-        new Date();
+    const date =
+        dateValue instanceof Date
+            ? dateValue
+            : new Date(dateValue);
 
-    const year =
-        today.getFullYear();
+    if (Number.isNaN(date.getTime())) {
 
-    const month =
-        String(
-            today.getMonth() + 1
-        ).padStart(2, "0");
+        return "";
+
+    }
 
     const day =
-        String(
-            today.getDate()
-        ).padStart(2, "0");
+        String(date.getDate()).padStart(2, "0");
+
+    const month =
+        String(date.getMonth() + 1).padStart(2, "0");
+
+    const year =
+        date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+
+}
+
+
+function parseDisplayDate(value) {
+
+    if (!value || typeof value !== "string") {
+
+        return "";
+
+    }
+
+    const parts = value.trim().split("/");
+
+    if (parts.length !== 3) {
+
+        return "";
+
+    }
+
+    const [day, month, year] = parts;
+
+    if (!day || !month || !year) {
+
+        return "";
+
+    }
+
+    const date = new Date(`${year}-${month}-${day}`);
+
+    if (Number.isNaN(date.getTime())) {
+
+        return "";
+
+    }
+
+    const formatted =
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+    return formatted;
+
+}
+
+
+function setDefaultDate() {
 
     tanggalInput.value =
-        `${year}-${month}-${day}`;
+        formatDateToDisplay(new Date());
 
 }
 
@@ -839,8 +890,25 @@ async function savePayment() {
     const tanggal =
         tanggalInput.value;
 
+    const tanggalIso =
+        parseDisplayDate(tanggal);
+
     const jenisTransaksi =
         jenisTransaksiSelect.value;
+
+
+    if (!tanggalIso) {
+
+        showMessage(
+            "Tanggal pembayaran tidak valid. Gunakan format DD/MM/YYYY.",
+            "error"
+        );
+
+        tanggalInput.focus();
+
+        return;
+
+    }
 
 
     if (jenisTransaksi !== "DFT" && !siswa) {
@@ -944,7 +1012,7 @@ async function savePayment() {
         const paymentData = {
 
             tanggal:
-                tanggal,
+                tanggalIso,
 
             siswa:
                 siswa,
