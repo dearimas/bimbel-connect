@@ -302,8 +302,13 @@
             if (siswaError) {
 
                 console.error(
-                    "Master siswa:",
-                    siswaError
+                    "Master siswa gagal dimuat:",
+                    {
+                        code: siswaError.code,
+                        message: siswaError.message,
+                        details: siswaError.details,
+                        hint: siswaError.hint
+                    }
                 );
 
                 throw siswaError;
@@ -335,8 +340,13 @@
             if (kelasError) {
 
                 console.error(
-                    "Master kelas:",
-                    kelasError
+                    "Master kelas gagal dimuat:",
+                    {
+                        code: kelasError.code,
+                        message: kelasError.message,
+                        details: kelasError.details,
+                        hint: kelasError.hint
+                    }
                 );
 
                 throw kelasError;
@@ -1086,7 +1096,7 @@
 
 
                 showMessage(
-                    "Gagal memuat data. Periksa koneksi Supabase dan RLS.",
+                    `Gagal memuat data siswa (${error.code || "tanpa kode"}). Periksa Console untuk detailnya.`,
                     "error"
                 );
 
