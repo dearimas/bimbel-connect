@@ -2,1107 +2,1311 @@
            SUPABASE
         ===================================================== */
 
-        const SUPABASE_URL =
-            "https://ipnoshuvofomxwssamma.supabase.co";
+const SUPABASE_URL =
+    "https://ipnoshuvofomxwssamma.supabase.co";
 
-        const SUPABASE_KEY =
-            "sb_publishable_Q95e9ofqnDyPhavmx8GLSA_Dr3rnuj5";
-
-
-        const supabaseClient =
-            window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_KEY
-            );
+const SUPABASE_KEY =
+    "sb_publishable_Q95e9ofqnDyPhavmx8GLSA_Dr3rnuj5";
 
 
-
-        /* =====================================================
-           ELEMENT
-        ===================================================== */
-
-        const siswaSelect =
-            document.getElementById("siswa");
-
-        const studentInfo =
-            document.getElementById("studentInfo");
-
-        const studentMain =
-            document.getElementById("studentMain");
-
-        const studentMeta =
-            document.getElementById("studentMeta");
-
-        const tanggalInput =
-            document.getElementById("tanggal");
-
-        const kodeInput =
-            document.getElementById("kode");
-
-        const jenisTransaksiSelect =
-            document.getElementById("jenis_transaksi");
-
-        const saveButton =
-            document.getElementById("saveButton");
-
-        const messageBox =
-            document.getElementById("message");
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
 
 
-        /* =====================================================
-           STATE
-        ===================================================== */
+/* =====================================================
+   ELEMENT
+===================================================== */
 
-        let currentUser = null;
+const siswaSelect =
+    document.getElementById("siswa");
 
-        let currentStaff = null;
+const studentInfo =
+    document.getElementById("studentInfo");
 
-        let students = [];
+const studentMain =
+    document.getElementById("studentMain");
+
+const studentMeta =
+    document.getElementById("studentMeta");
+
+const tanggalInput =
+    document.getElementById("tanggal");
+
+const kodeInput =
+    document.getElementById("kode");
+
+const jenisTransaksiSelect =
+    document.getElementById("jenis_transaksi");
+
+const saveButton =
+    document.getElementById("saveButton");
+
+const messageBox =
+    document.getElementById("message");
 
 
 
-        /* =====================================================
-           FORMAT RUPIAH
-        ===================================================== */
+/* =====================================================
+   STATE
+===================================================== */
 
-        function formatRupiah(value) {
+let currentUser = null;
 
-            const number =
-                Number(value) || 0;
+let currentStaff = null;
 
-            return new Intl.NumberFormat(
-                "id-ID",
-                {
-                    style: "currency",
-                    currency: "IDR",
-                    maximumFractionDigits: 0
+let students = [];
+
+
+
+/* =====================================================
+   FORMAT RUPIAH
+===================================================== */
+
+function formatRupiah(value) {
+
+    const number =
+        Number(value) || 0;
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }
+    ).format(number);
+
+}
+
+
+function parseCurrencyInput(value) {
+
+    if (value === null || value === undefined || value === "") {
+
+        return 0;
+
+    }
+
+    const raw = String(value).trim();
+
+    if (!raw) {
+
+        return 0;
+
+    }
+
+    const digitsOnly = raw.replace(/[^\d]/g, "");
+
+    if (!digitsOnly) {
+
+        return 0;
+
+    }
+
+    const number = Number(digitsOnly);
+
+    return Number.isFinite(number) ? number : 0;
+
+}
+
+
+function formatCurrencyInput(value) {
+
+    const parsed = parseCurrencyInput(value);
+
+    if (!Number.isFinite(parsed)) {
+
+        return "";
+
+    }
+
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }
+    ).format(parsed);
+
+}
+
+
+function bindCurrencyInput(id) {
+
+    const input = document.getElementById(id);
+
+    if (!input) return;
+
+    input.addEventListener("input", function () {
+
+        const rawValue = this.value;
+
+        if (!rawValue || rawValue.trim() === "") {
+
+            this.value = id === "non_tunai_nominal" ? "0" : "";
+
+            if (id === "non_tunai_nominal") {
+
+                if (!document.getElementById("non_tunai_tipe").value) {
+
+                    document.getElementById("non_tunai_keterangan").value = "";
+
                 }
-            ).format(number);
 
-        }
-
-
-
-        /* =====================================================
-           MESSAGE
-        ===================================================== */
-
-        function showMessage(
-            text,
-            type = "success"
-        ) {
-
-            messageBox.textContent =
-                text;
-
-            messageBox.className =
-                "message show " + type;
-
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-
-        }
-
-
-
-        /* =====================================================
-           DEFAULT DATE
-        ===================================================== */
-
-        function setDefaultDate() {
-
-            const today =
-                new Date();
-
-            const year =
-                today.getFullYear();
-
-            const month =
-                String(
-                    today.getMonth() + 1
-                ).padStart(2, "0");
-
-            const day =
-                String(
-                    today.getDate()
-                ).padStart(2, "0");
-
-            tanggalInput.value =
-                `${year}-${month}-${day}`;
-
-        }
-
-
-
-        /* =====================================================
-           GENERATE KODE
-        ===================================================== */
-
-        function generatePaymentCode() {
-
-            const now =
-                new Date();
-
-            const year =
-                now.getFullYear();
-
-            const month =
-                String(
-                    now.getMonth() + 1
-                ).padStart(2, "0");
-
-            const day =
-                String(
-                    now.getDate()
-                ).padStart(2, "0");
-
-            const random =
-                Math.floor(
-                    1000 +
-                    Math.random() * 9000
-                );
-
-            return `BYR-${year}${month}${day}-${random}`;
-
-        }
-
-
-
-        /* =====================================================
-           CEK LOGIN
-        ===================================================== */
-
-        async function checkLogin() {
-
-            const {
-                data: {
-                    session
-                },
-                error
-            } =
-                await supabaseClient.auth.getSession();
-
-
-            if (error) {
-
-                console.error(
-                    "Gagal memeriksa sesi:",
-                    error
-                );
-
-                throw error;
+                updateUangKembali();
 
             }
 
-
-            if (!session) {
-
-                window.location.href =
-                    "index.html";
-
-                return false;
-
-            }
-
-
-            currentUser =
-                session.user;
-
-
-            return true;
+            return;
 
         }
 
+        const numericValue = parseCurrencyInput(rawValue);
+        this.value = formatCurrencyInput(numericValue);
 
+        if (id === "total_bayar" || id === "tunai_baru" || id === "non_tunai_nominal") {
 
-        /* =====================================================
-           LOAD STAFF
-        ===================================================== */
-
-        async function loadStaff() {
-
-            const email =
-                currentUser.email;
-
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .from("staff")
-                    .select(
-                        "kode, nama, email"
-                    )
-                    .eq(
-                        "email",
-                        email
-                    )
-                    .maybeSingle();
-
-
-            if (error) {
-
-                console.error(
-                    "Staff error:",
-                    error
-                );
-
-                return null;
-
-            }
-
-
-            currentStaff =
-                data;
-
-
-            return data;
+            updateUangKembali();
 
         }
 
+    });
+
+    input.addEventListener("blur", function () {
+
+        const current = this.value;
+
+        if (!current || current.trim() === "") {
+
+            this.value = id === "non_tunai_nominal" ? "0" : "";
+
+        } else {
+
+            this.value = formatCurrencyInput(this.value);
+
+        }
+
+        if (id === "total_bayar" || id === "tunai_baru" || id === "non_tunai_nominal") {
+
+            updateUangKembali();
+
+        }
+
+    });
+
+}
 
 
-        /* =====================================================
-           LOAD SISWA + KELAS
-        ===================================================== */
+function updateUangKembali() {
 
-        async function loadStudents() {
+    const totalBayar = parseCurrencyInput(document.getElementById("total_bayar").value);
+    const tunai = parseCurrencyInput(document.getElementById("tunai_baru").value);
+    const nonTunai = parseCurrencyInput(document.getElementById("non_tunai_nominal").value);
 
-            siswaSelect.innerHTML =
-                `<option value="">
+    const kembalian = Math.max(0, totalBayar - tunai - nonTunai);
+    const uangKembaliInput = document.getElementById("uang_kembali");
+
+    uangKembaliInput.value = formatCurrencyInput(kembalian);
+
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function showMessage(
+    text,
+    type = "success"
+) {
+
+    messageBox.textContent =
+        text;
+
+    messageBox.className =
+        "message show " + type;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+
+/* =====================================================
+   DEFAULT DATE
+===================================================== */
+
+function setDefaultDate() {
+
+    const today =
+        new Date();
+
+    const year =
+        today.getFullYear();
+
+    const month =
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            today.getDate()
+        ).padStart(2, "0");
+
+    tanggalInput.value =
+        `${year}-${month}-${day}`;
+
+}
+
+
+
+/* =====================================================
+   GENERATE KODE
+===================================================== */
+
+function generatePaymentCode() {
+
+    const now =
+        new Date();
+
+    const year =
+        now.getFullYear();
+
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            now.getDate()
+        ).padStart(2, "0");
+
+    const random =
+        Math.floor(
+            1000 +
+            Math.random() * 9000
+        );
+
+    return `BYR-${year}${month}${day}-${random}`;
+
+}
+
+
+
+/* =====================================================
+   CEK LOGIN
+===================================================== */
+
+async function checkLogin() {
+
+    const {
+        data: {
+            session
+        },
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if (error) {
+
+        console.error(
+            "Gagal memeriksa sesi:",
+            error
+        );
+
+        throw error;
+
+    }
+
+
+    if (!session) {
+
+        window.location.href =
+            "index.html";
+
+        return false;
+
+    }
+
+
+    currentUser =
+        session.user;
+
+
+    return true;
+
+}
+
+
+
+/* =====================================================
+   LOAD STAFF
+===================================================== */
+
+async function loadStaff() {
+
+    const email =
+        currentUser.email;
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("staff")
+            .select(
+                "kode, nama, email"
+            )
+            .eq(
+                "email",
+                email
+            )
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Staff error:",
+            error
+        );
+
+        return null;
+
+    }
+
+
+    currentStaff =
+        data;
+
+
+    return data;
+
+}
+
+
+
+/* =====================================================
+   LOAD SISWA + KELAS
+===================================================== */
+
+async function loadStudents() {
+
+    siswaSelect.innerHTML =
+        `<option value="">
             Memuat daftar siswa...
         </option>`;
 
 
-            /*
-             * Ambil master siswa
-             */
+    /*
+     * Ambil master siswa
+     */
 
-            const {
-                data: siswaData,
-                error: siswaError
-            } =
-                await supabaseClient
-                    .from("master_siswa")
-                    .select(
-                        "kode, nama, kelas_kode"
-                    )
-                    .order(
-                        "nama",
-                        {
-                            ascending: true
-                        }
-                    );
-
-
-            if (siswaError) {
-
-                console.error(
-                    "Master siswa gagal dimuat:",
-                    {
-                        code: siswaError.code,
-                        message: siswaError.message,
-                        details: siswaError.details,
-                        hint: siswaError.hint
-                    }
-                );
-
-                throw siswaError;
-
-            }
-
-
-            /*
-             * Ambil master kelas
-             */
-
-            const {
-                data: kelasData,
-                error: kelasError
-            } =
-                await supabaseClient
-                    .from("master_kelas")
-                    .select(
-                        "kode, nama, tingkat"
-                    )
-                    .order(
-                        "tingkat",
-                        {
-                            ascending: true
-                        }
-                    );
-
-
-            if (kelasError) {
-
-                console.error(
-                    "Master kelas gagal dimuat:",
-                    {
-                        code: kelasError.code,
-                        message: kelasError.message,
-                        details: kelasError.details,
-                        hint: kelasError.hint
-                    }
-                );
-
-                throw kelasError;
-
-            }
-
-
-            /*
-             * Buat map kelas
-             */
-
-            const kelasMap =
-                new Map();
-
-
-            kelasData.forEach(
-                kelas => {
-
-                    kelasMap.set(
-                        kelas.kode,
-                        kelas
-                    );
-
+    const {
+        data: siswaData,
+        error: siswaError
+    } =
+        await supabaseClient
+            .from("master_siswa")
+            .select(
+                "kode, nama, kelas_kode"
+            )
+            .order(
+                "nama",
+                {
+                    ascending: true
                 }
             );
 
 
-            /*
-             * Gabungkan siswa + kelas
-             */
+    if (siswaError) {
 
-            students =
-                siswaData.map(
-                    siswa => {
+        console.error(
+            "Master siswa gagal dimuat:",
+            {
+                code: siswaError.code,
+                message: siswaError.message,
+                details: siswaError.details,
+                hint: siswaError.hint
+            }
+        );
 
-                        const kelas =
-                            kelasMap.get(
-                                siswa.kelas_kode
-                            );
+        throw siswaError;
 
-
-                        return {
-
-                            kode:
-                                siswa.kode,
-
-                            nama:
-                                siswa.nama,
-
-                            kelasKode:
-                                siswa.kelas_kode,
-
-                            kelasNama:
-                                kelas
-                                    ? kelas.nama
-                                    : "-",
-
-                            tingkat:
-                                kelas
-                                    ? kelas.tingkat
-                                    : "-"
-
-                        };
-
-                    }
-                );
+    }
 
 
-            /*
-             * Isi dropdown
-             */
+    /*
+     * Ambil master kelas
+     */
 
-            siswaSelect.innerHTML =
-                `<option value="">
-            Pilih siswa...
-        </option>`;
-
-
-            students.forEach(
-                siswa => {
-
-                    const option =
-                        document.createElement(
-                            "option"
-                        );
-
-
-                    option.value =
-                        siswa.kode;
-
-
-                    option.textContent =
-                        `${siswa.kode} — ${siswa.nama} · ${siswa.kelasNama} · Tingkat ${siswa.tingkat}`;
-
-
-                    siswaSelect.appendChild(
-                        option
-                    );
-
+    const {
+        data: kelasData,
+        error: kelasError
+    } =
+        await supabaseClient
+            .from("master_kelas")
+            .select(
+                "kode, nama, tingkat"
+            )
+            .order(
+                "tingkat",
+                {
+                    ascending: true
                 }
+            );
+
+
+    if (kelasError) {
+
+        console.error(
+            "Master kelas gagal dimuat:",
+            {
+                code: kelasError.code,
+                message: kelasError.message,
+                details: kelasError.details,
+                hint: kelasError.hint
+            }
+        );
+
+        throw kelasError;
+
+    }
+
+
+    /*
+     * Buat map kelas
+     */
+
+    const kelasMap =
+        new Map();
+
+
+    kelasData.forEach(
+        kelas => {
+
+            kelasMap.set(
+                kelas.kode,
+                kelas
             );
 
         }
+    );
 
 
+    /*
+     * Gabungkan siswa + kelas
+     */
 
-        /* =====================================================
-           SISWA DIPILIH
-        ===================================================== */
+    students =
+        siswaData.map(
+            siswa => {
 
-        siswaSelect.addEventListener(
-            "change",
-            function () {
-
-                const kode =
-                    this.value;
-
-
-                const siswa =
-                    students.find(
-                        item =>
-                            item.kode === kode
+                const kelas =
+                    kelasMap.get(
+                        siswa.kelas_kode
                     );
 
 
-                if (!siswa) {
+                return {
 
-                    studentInfo.classList.remove(
-                        "show"
-                    );
+                    kode:
+                        siswa.kode,
 
-                    return;
+                    nama:
+                        siswa.nama,
 
-                }
+                    kelasKode:
+                        siswa.kelas_kode,
 
+                    kelasNama:
+                        kelas
+                            ? kelas.nama
+                            : "-",
 
-                studentMain.textContent =
-                    `${siswa.kode} — ${siswa.nama}`;
+                    tingkat:
+                        kelas
+                            ? kelas.tingkat
+                            : "-"
 
-
-                studentMeta.textContent =
-                    `Kelas ${siswa.kelasNama} · Tingkat ${siswa.tingkat}`;
-
-
-                studentInfo.classList.add(
-                    "show"
-                );
+                };
 
             }
         );
 
 
+    /*
+     * Isi dropdown
+     */
 
-        /* =====================================================
-           VALIDASI NOMINAL
-        ===================================================== */
-
-        function getAmount(id) {
-
-            const value =
-                document.getElementById(id).value;
-
-            const amount =
-                Number(value || 0);
+    siswaSelect.innerHTML =
+        `<option value="">
+            Pilih siswa...
+        </option>`;
 
 
-            if (!Number.isFinite(amount) || amount < 0) {
+    students.forEach(
+        siswa => {
 
-                throw new Error(
-                    "Nominal pembayaran tidak boleh negatif."
+            const option =
+                document.createElement(
+                    "option"
                 );
 
-            }
+
+            option.value =
+                siswa.kode;
 
 
-            return amount;
-
-        }
-
+            option.textContent =
+                `${siswa.kode} — ${siswa.nama} · ${siswa.kelasNama} · Tingkat ${siswa.tingkat}`;
 
 
-        /* =====================================================
-           NON TUNAI
-        ===================================================== */
-
-        function updateNonCashReference() {
-
-            const type =
-                document.getElementById("non_tunai_tipe").value;
-
-            const label =
-                document.getElementById("nonTunaiKeteranganLabel");
-
-            const input =
-                document.getElementById("non_tunai_keterangan");
-
-            const details = {
-                transfer: {
-                    label: "Bank Transfer",
-                    placeholder: "Contoh: BCA / BRI / Mandiri"
-                },
-                qris: {
-                    label: "Bank / Penyedia QRIS",
-                    placeholder: "Contoh: BCA / GoPay / DANA"
-                },
-                voucher: {
-                    label: "Nomor Voucher",
-                    placeholder: "Masukkan nomor atau keterangan voucher"
-                }
-            };
-
-            const detail =
-                details[type] || {
-                    label: "Bank / Nomor Voucher",
-                    placeholder: "Pilih metode non tunai terlebih dahulu"
-                };
-
-            label.textContent =
-                detail.label;
-
-            input.placeholder =
-                detail.placeholder;
+            siswaSelect.appendChild(
+                option
+            );
 
         }
+    );
 
-
-        function getNonCashValues() {
-
-            const type =
-                document.getElementById("non_tunai_tipe").value;
-
-            const nominal =
-                getAmount("non_tunai_nominal");
-
-            const detail =
-                document.getElementById("non_tunai_keterangan")
-                    .value
-                    .trim() || null;
-
-
-            if (nominal > 0 && !type) {
-
-                throw new Error(
-                    "Pilih metode untuk pembayaran non tunai."
-                );
-
-            }
-
-
-            if (type && nominal <= 0) {
-
-                throw new Error(
-                    "Masukkan nominal pembayaran non tunai."
-                );
-
-            }
-
-
-            return {
-                type,
-                nominal,
-                detail
-            };
-
-        }
+}
 
 
 
-        /* =====================================================
-           PAYMENT INPUT LISTENER
-        ===================================================== */
+/* =====================================================
+   SISWA DIPILIH
+===================================================== */
 
-        document
-            .getElementById("non_tunai_tipe")
-            .addEventListener(
-                "change",
-                updateNonCashReference
+siswaSelect.addEventListener(
+    "change",
+    function () {
+
+        const kode =
+            this.value;
+
+
+        const siswa =
+            students.find(
+                item =>
+                    item.kode === kode
             );
 
 
-
-        /* =====================================================
-           SIMPAN PEMBAYARAN
-        ===================================================== */
-
-        async function savePayment() {
-
-            messageBox.className =
-                "message";
-
-
-            const siswa =
-                siswaSelect.value;
-
-
-            const tanggal =
-                tanggalInput.value;
-
-            const jenisTransaksi =
-                jenisTransaksiSelect.value;
-
-
-            if (!siswa) {
-
-                showMessage(
-                    "Silakan pilih siswa terlebih dahulu.",
-                    "error"
-                );
-
-                siswaSelect.focus();
-
-                return;
-
-            }
-
-
-            if (!tanggal) {
-
-                showMessage(
-                    "Tanggal pembayaran wajib diisi.",
-                    "error"
-                );
-
-                tanggalInput.focus();
-
-                return;
-
-            }
-
-
-            if (!jenisTransaksi) {
-
-                showMessage(
-                    "Silakan pilih jenis transaksi.",
-                    "error"
-                );
-
-                jenisTransaksiSelect.focus();
-
-                return;
-
-            }
-
-
-            const total =
-                Number(
-                    document.getElementById("total_bayar").value
-                ) || 0;
-
-
-            if (total <= 0) {
-
-                showMessage(
-                    "Total bayar wajib diisi.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            saveButton.disabled =
-                true;
-
-            saveButton.textContent =
-                "⏳ Menyimpan...";
-
-
-            try {
-
-                /*
-                 * Pastikan staff sudah diketahui
-                 */
-
-                if (!currentStaff) {
-
-                    await loadStaff();
-
-                }
-
-
-                if (!currentStaff || !currentStaff.kode) {
-
-                    throw new Error(
-                        "Profil staff tidak ditemukan. Pembayaran tidak dapat disimpan."
-                    );
-
-                }
-
-
-                const createdBy =
-                    currentStaff.kode;
-
-                const nonCash =
-                    getNonCashValues();
-
-
-                /*
-                 * Ambil nilai form
-                 */
-
-                const paymentData = {
-
-                    tanggal:
-                        tanggal,
-
-                    siswa:
-                        siswa,
-
-                    total_bayar:
-                        getAmount("total_bayar"),
-
-                    tunai:
-                        getAmount("tunai_baru"),
-
-                    uang_kembali:
-                        getAmount("uang_kembali"),
-
-                    transfer:
-                        nonCash.type === "transfer"
-                            ? nonCash.nominal
-                            : 0,
-
-                    transfer_bank:
-                        nonCash.type === "transfer"
-                            ? nonCash.detail
-                            : null,
-
-                    qris:
-                        nonCash.type === "qris"
-                            ? nonCash.nominal
-                            : 0,
-
-                    voucher:
-                        nonCash.type === "voucher"
-                            ? nonCash.nominal
-                            : 0,
-
-                    voucher_keterangan:
-                        nonCash.type === "voucher"
-                            ? nonCash.detail
-                            : null,
-
-                    catatan:
-                        document.getElementById(
-                            "catatan"
-                        ).value
-                            .trim() || null,
-
-                    batal:
-                        false,
-
-                    created_by:
-                        createdBy,
-
-                    updated_by:
-                        createdBy
-
-                };
-
-
-                console.log(
-                    "Data pembayaran:",
-                    paymentData
-                );
-
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabaseClient
-                        .rpc(
-                            "simpan_pembayaran",
-                            {
-                                p_jenis_transaksi: jenisTransaksi,
-                                p_tanggal: paymentData.tanggal,
-                                p_siswa: paymentData.siswa,
-                                p_total_bayar: paymentData.total_bayar,
-                                p_tunai: paymentData.tunai,
-                                p_uang_kembali: paymentData.uang_kembali,
-                                p_transfer: paymentData.transfer,
-                                p_transfer_bank: paymentData.transfer_bank,
-                                p_qris: paymentData.qris,
-                                p_voucher: paymentData.voucher,
-                                p_voucher_keterangan: paymentData.voucher_keterangan,
-                                p_catatan: paymentData.catatan
-                            }
-                        );
-
-
-                if (error) {
-
-                    console.error(
-                        "Gagal menyimpan:",
-                        error
-                    );
-
-                    throw error;
-
-                }
-
-
-                const savedCode =
-                    Array.isArray(data)
-                        ? data[0]?.kode
-                        : data?.kode;
-
-                kodeInput.value =
-                    savedCode || "";
-
-                showMessage(
-                    `Pembayaran berhasil disimpan. Kode: ${savedCode || "tidak tersedia"}`,
-                    "success"
-                );
-
-
-                /*
-                 * Reset form
-                 */
-
-                resetForm();
-
-
-            } catch (error) {
-
-                console.error(
-                    error
-                );
-
-
-                showMessage(
-                    "Gagal menyimpan pembayaran: " +
-                    error.message,
-                    "error"
-                );
-
-
-            } finally {
-
-                saveButton.disabled =
-                    false;
-
-                saveButton.textContent =
-                    "💾 Simpan Pembayaran";
-
-            }
-
-        }
-
-
-
-        /* =====================================================
-           RESET FORM
-        ===================================================== */
-
-        function resetForm() {
-
-            siswaSelect.value =
-                "";
+        if (!siswa) {
 
             studentInfo.classList.remove(
                 "show"
             );
 
-
-            document.getElementById(
-                "total_bayar"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "tunai_baru"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "non_tunai_tipe"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "non_tunai_nominal"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "non_tunai_keterangan"
-            ).value =
-                "";
-
-
-            jenisTransaksiSelect.value =
-                "";
-
-
-            document.getElementById(
-                "tunai"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "transfer"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "qris"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "voucher"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "transfer_bank"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "voucher_keterangan"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "uang_kembali"
-            ).value =
-                "";
-
-
-            document.getElementById(
-                "catatan"
-            ).value =
-                "";
-
-
-            updateNonCashReference();
-
-
-            setDefaultDate();
+            return;
 
         }
 
 
-
-        /* =====================================================
-           CANCEL
-        ===================================================== */
-
-        document
-            .getElementById(
-                "cancelButton"
-            )
-            .addEventListener(
-                "click",
-                function () {
-
-                    window.location.href =
-                    "./";
-
-                }
-            );
+        studentMain.textContent =
+            `${siswa.kode} — ${siswa.nama}`;
 
 
+        studentMeta.textContent =
+            `Kelas ${siswa.kelasNama} · Tingkat ${siswa.tingkat}`;
 
-        /* =====================================================
-           SAVE
-        ===================================================== */
 
-        saveButton.addEventListener(
-            "click",
-            savePayment
+        studentInfo.classList.add(
+            "show"
         );
 
+    }
+);
 
 
-        /* =====================================================
-           INIT
-        ===================================================== */
 
-        async function init() {
+/* =====================================================
+   VALIDASI NOMINAL
+===================================================== */
 
-            try {
+function getAmount(id) {
 
-                const loggedIn =
-                    await checkLogin();
+    const value =
+        document.getElementById(id).value;
 
-
-                if (!loggedIn) {
-
-                    return;
-
-                }
+    const amount =
+        parseCurrencyInput(value);
 
 
-                setDefaultDate();
+    if (!Number.isFinite(amount) || amount < 0) {
+
+        throw new Error(
+            "Nominal pembayaran tidak boleh negatif."
+        );
+
+    }
 
 
-                updateNonCashReference();
+    return amount;
+
+}
 
 
-                const staff =
-                    await loadStaff();
+
+/* =====================================================
+   NON TUNAI
+===================================================== */
+
+function updateNonCashReference() {
+
+    const type =
+        document.getElementById("non_tunai_tipe").value;
+
+    const label =
+        document.getElementById("nonTunaiKeteranganLabel");
+
+    const input =
+        document.getElementById("non_tunai_keterangan");
+
+    const nominalInput =
+        document.getElementById("non_tunai_nominal");
+
+    const details = {
+        transfer: {
+            label: "Bank Transfer",
+            placeholder: "Contoh: BCA / BRI / Mandiri"
+        },
+        qris: {
+            label: "Bank / Penyedia QRIS",
+            placeholder: "Contoh: BCA / GoPay / DANA"
+        },
+        voucher: {
+            label: "Nomor Voucher",
+            placeholder: "Masukkan nomor atau keterangan voucher"
+        }
+    };
+
+    const detail =
+        details[type] || {
+            label: "Bank / Nomor Voucher",
+            placeholder: "Pilih metode non tunai terlebih dahulu"
+        };
+
+    label.textContent =
+        detail.label;
+
+    input.placeholder =
+        detail.placeholder;
+
+    if (!type) {
+
+        nominalInput.disabled = true;
+        nominalInput.value = "0";
+        input.disabled = true;
+        input.value = "";
+
+    } else {
+
+        nominalInput.disabled = false;
+        input.disabled = false;
+
+        if (!input.value.trim()) {
+
+            input.value = "";
+
+        }
+
+    }
+
+    updateUangKembali();
+
+}
 
 
-                if (!staff || !staff.kode) {
+function getNonCashValues() {
 
-                    saveButton.disabled =
-                        true;
+    const type =
+        document.getElementById("non_tunai_tipe").value;
 
-                    showMessage(
-                        "Profil staff tidak ditemukan. Pembayaran belum dapat disimpan.",
-                        "error"
-                    );
+    const nominal =
+        getAmount("non_tunai_nominal");
 
-                }
-
-
-                await loadStudents();
+    const detail =
+        document.getElementById("non_tunai_keterangan")
+            .value
+            .trim() || null;
 
 
-            } catch (error) {
+    if (nominal > 0 && !type) {
 
-                console.error(
-                    "INIT ERROR:",
-                    error
-                );
+        throw new Error(
+            "Pilih metode untuk pembayaran non tunai."
+        );
 
-
-                siswaSelect.innerHTML =
-                    `<option value="">
-                Gagal memuat data siswa
-            </option>`;
+    }
 
 
-                showMessage(
-                    `Gagal memuat data siswa (${error.code || "tanpa kode"}). Periksa Console untuk detailnya.`,
-                    "error"
-                );
+    if (type && nominal <= 0) {
+
+        throw new Error(
+            "Masukkan nominal pembayaran non tunai."
+        );
+
+    }
+
+
+    return {
+        type,
+        nominal,
+        detail
+    };
+
+}
+
+
+
+/* =====================================================
+   PAYMENT INPUT LISTENER
+===================================================== */
+
+document
+    .getElementById("non_tunai_tipe")
+    .addEventListener(
+        "change",
+        function () {
+
+            updateNonCashReference();
+
+            if (!this.value) {
+
+                document.getElementById("non_tunai_nominal").value = "0";
+                document.getElementById("non_tunai_keterangan").value = "";
 
             }
 
         }
+    );
 
 
-        init();
+function updateJenisTransaksiState() {
+
+    const isPendaftaran = jenisTransaksiSelect.value === "DFT";
+
+    siswaSelect.disabled = isPendaftaran;
+
+    if (isPendaftaran) {
+
+        siswaSelect.value = "";
+        studentInfo.classList.remove("show");
+
+    }
+
+}
+
+
+typeTransaksiSelect = document.getElementById("jenis_transaksi");
+if (typeTransaksiSelect) {
+
+    typeTransaksiSelect.addEventListener("change", function () {
+
+        updateJenisTransaksiState();
+
+    });
+
+}
+
+
+/* =====================================================
+   SIMPAN PEMBAYARAN
+===================================================== */
+
+async function savePayment() {
+
+    messageBox.className =
+        "message";
+
+
+    const siswa =
+        siswaSelect.value;
+
+
+    const tanggal =
+        tanggalInput.value;
+
+    const jenisTransaksi =
+        jenisTransaksiSelect.value;
+
+
+    if (jenisTransaksi !== "DFT" && !siswa) {
+
+        showMessage(
+            "Silakan pilih siswa terlebih dahulu.",
+            "error"
+        );
+
+        siswaSelect.focus();
+
+        return;
+
+    }
+
+
+    if (!tanggal) {
+
+        showMessage(
+            "Tanggal pembayaran wajib diisi.",
+            "error"
+        );
+
+        tanggalInput.focus();
+
+        return;
+
+    }
+
+
+    if (!jenisTransaksi) {
+
+        showMessage(
+            "Silakan pilih jenis transaksi.",
+            "error"
+        );
+
+        jenisTransaksiSelect.focus();
+
+        return;
+
+    }
+
+
+    const total =
+        parseCurrencyInput(document.getElementById("total_bayar").value) || 0;
+
+
+    if (total <= 0) {
+
+        showMessage(
+            "Total bayar wajib diisi.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    saveButton.disabled =
+        true;
+
+    saveButton.textContent =
+        "⏳ Menyimpan...";
+
+
+    try {
+
+        /*
+         * Pastikan staff sudah diketahui
+         */
+
+        if (!currentStaff) {
+
+            await loadStaff();
+
+        }
+
+
+        if (!currentStaff || !currentStaff.kode) {
+
+            throw new Error(
+                "Profil staff tidak ditemukan. Pembayaran tidak dapat disimpan."
+            );
+
+        }
+
+
+        const createdBy =
+            currentStaff.kode;
+
+        const nonCash =
+            getNonCashValues();
+
+
+        /*
+         * Ambil nilai form
+         */
+
+        const paymentData = {
+
+            tanggal:
+                tanggal,
+
+            siswa:
+                siswa,
+
+            total_bayar:
+                getAmount("total_bayar"),
+
+            tunai:
+                getAmount("tunai_baru"),
+
+            uang_kembali:
+                getAmount("uang_kembali"),
+
+            transfer:
+                nonCash.type === "transfer"
+                    ? nonCash.nominal
+                    : 0,
+
+            transfer_bank:
+                nonCash.type === "transfer"
+                    ? nonCash.detail
+                    : null,
+
+            qris:
+                nonCash.type === "qris"
+                    ? nonCash.nominal
+                    : 0,
+
+            voucher:
+                nonCash.type === "voucher"
+                    ? nonCash.nominal
+                    : 0,
+
+            voucher_keterangan:
+                nonCash.type === "voucher"
+                    ? nonCash.detail
+                    : null,
+
+            catatan:
+                document.getElementById(
+                    "catatan"
+                ).value
+                    .trim() || null,
+
+            batal:
+                false,
+
+            created_by:
+                createdBy,
+
+            updated_by:
+                createdBy
+
+        };
+
+
+        console.log(
+            "Data pembayaran:",
+            paymentData
+        );
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .rpc(
+                    "simpan_pembayaran",
+                    {
+                        p_jenis_transaksi: jenisTransaksi,
+                        p_tanggal: paymentData.tanggal,
+                        p_siswa: paymentData.siswa,
+                        p_total_bayar: paymentData.total_bayar,
+                        p_tunai: paymentData.tunai,
+                        p_uang_kembali: paymentData.uang_kembali,
+                        p_transfer: paymentData.transfer,
+                        p_transfer_bank: paymentData.transfer_bank,
+                        p_qris: paymentData.qris,
+                        p_voucher: paymentData.voucher,
+                        p_voucher_keterangan: paymentData.voucher_keterangan,
+                        p_catatan: paymentData.catatan
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Gagal menyimpan:",
+                error
+            );
+
+            throw error;
+
+        }
+
+
+        const savedCode =
+            Array.isArray(data)
+                ? data[0]?.kode
+                : data?.kode;
+
+        kodeInput.value =
+            savedCode || "";
+
+        showMessage(
+            `Pembayaran berhasil disimpan. Kode: ${savedCode || "tidak tersedia"}`,
+            "success"
+        );
+
+
+        /*
+         * Reset form
+         */
+
+        resetForm();
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        showMessage(
+            "Gagal menyimpan pembayaran: " +
+            error.message,
+            "error"
+        );
+
+
+    } finally {
+
+        saveButton.disabled =
+            false;
+
+        saveButton.textContent =
+            "💾 Simpan Pembayaran";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   RESET FORM
+===================================================== */
+
+function resetForm() {
+
+    siswaSelect.value =
+        "";
+
+    studentInfo.classList.remove(
+        "show"
+    );
+
+
+    document.getElementById(
+        "total_bayar"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "tunai_baru"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "non_tunai_tipe"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "non_tunai_nominal"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "non_tunai_keterangan"
+    ).value =
+        "";
+
+
+    jenisTransaksiSelect.value =
+        "";
+
+
+    document.getElementById(
+        "tunai"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "transfer"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "qris"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "voucher"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "transfer_bank"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "voucher_keterangan"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "uang_kembali"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "catatan"
+    ).value =
+        "";
+
+
+    updateNonCashReference();
+
+
+    setDefaultDate();
+
+}
+
+
+
+/* =====================================================
+   CANCEL
+===================================================== */
+
+document
+    .getElementById(
+        "cancelButton"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "./";
+
+        }
+    );
+
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+saveButton.addEventListener(
+    "click",
+    savePayment
+);
+
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+async function init() {
+
+    try {
+
+        const loggedIn =
+            await checkLogin();
+
+
+        if (!loggedIn) {
+
+            return;
+
+        }
+
+
+        bindCurrencyInput("total_bayar");
+        bindCurrencyInput("tunai_baru");
+        bindCurrencyInput("non_tunai_nominal");
+
+        const uangKembaliInput = document.getElementById("uang_kembali");
+        uangKembaliInput.readOnly = true;
+        uangKembaliInput.value = "0";
+
+        document.getElementById("non_tunai_tipe").value = "";
+        document.getElementById("non_tunai_nominal").value = "0";
+        document.getElementById("non_tunai_keterangan").value = "";
+        document.getElementById("non_tunai_nominal").disabled = true;
+        document.getElementById("non_tunai_keterangan").disabled = true;
+
+        updateJenisTransaksiState();
+        updateNonCashReference();
+
+
+        const staff =
+            await loadStaff();
+
+
+        if (!staff || !staff.kode) {
+
+            saveButton.disabled =
+                true;
+
+            showMessage(
+                "Profil staff tidak ditemukan. Pembayaran belum dapat disimpan.",
+                "error"
+            );
+
+        }
+
+
+        await loadStudents();
+
+
+    } catch (error) {
+
+        console.error(
+            "INIT ERROR:",
+            error
+        );
+
+
+        siswaSelect.innerHTML =
+            `<option value="">
+                Gagal memuat data siswa
+            </option>`;
+
+
+        showMessage(
+            `Gagal memuat data siswa (${error.code || "tanpa kode"}). Periksa Console untuk detailnya.`,
+            "error"
+        );
+
+    }
+
+}
+
+
+init();
