@@ -384,7 +384,7 @@
 
                         const kelas =
                             kelasMap.get(
-                                siswa.kelas
+                                siswa.kelas_kode
                             );
 
 
@@ -397,7 +397,7 @@
                                 siswa.nama,
 
                             kelasKode:
-                                siswa.kelas,
+                                siswa.kelas_kode,
 
                             kelasNama:
                                 kelas
