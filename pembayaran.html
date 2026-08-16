@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pembayaran - Bimbel Connect</title>
+
+    <link
+        rel="icon"
+        type="image/x-icon"
+        href="icon.ico"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+
+            --blue: #4f7cff;
+            --purple: #8b5cf6;
+            --yellow: #ffc857;
+            --pink: #ff6fae;
+            --green: #42c98a;
+            --orange: #ff9966;
+
+            --dark: #26324a;
+            --muted: #74809a;
+
+            --bg: #f5f7fc;
+            --white: #ffffff;
+
+            --danger: #ef5b6b;
+
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #eef5ff 0%,
+                    #f8f1ff 55%,
+                    #fff9ec 100%
+                );
+
+            color: var(--dark);
+
+        }
+
+
+        button,
+        input,
+        select,
+        textarea {
+
+            font-family: inherit;
+
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+
+            position: relative;
+
+            overflow: hidden;
+
+            padding:
+                20px
+                18px
+                45px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            border-radius:
+                0 0 28px 28px;
+
+            box-shadow:
+                0 10px 30px
+                rgba(79,124,255,0.18);
+
+        }
+
+
+        .header::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255,255,255,0.08);
+
+            top: -80px;
+            right: -50px;
+
+        }
+
+
+        .header-content {
+
+            position: relative;
+
+            z-index: 2;
+
+            max-width: 900px;
+
+            margin: auto;
+
+        }
+
+
+        .topbar {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 22px;
+
+        }
+
+
+        .back-button {
+
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 13px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.25);
+
+            background:
+                rgba(255,255,255,0.12);
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 21px;
+
+            backdrop-filter:
+                blur(8px);
+
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            font-weight: 800;
+
+            font-size: 17px;
+
+        }
+
+
+        .brand img {
+
+            width: 35px;
+            height: 35px;
+
+            padding: 4px;
+
+            background: white;
+
+            border-radius: 10px;
+
+            object-fit: contain;
+
+        }
+
+
+        .page-title {
+
+            margin: 0;
+
+            font-size: 26px;
+
+            font-weight: 800;
+
+        }
+
+
+        .page-subtitle {
+
+            margin:
+                5px 0 0;
+
+            color:
+                rgba(255,255,255,0.78);
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================
+           CONTENT
+        ========================= */
+
+        .content {
+
+            position: relative;
+
+            z-index: 3;
+
+            max-width: 900px;
+
+            margin:
+                -22px auto 0;
+
+            padding:
+                0 15px 40px;
+
+        }
+
+
+        .card {
+
+            background:
+                rgba(255,255,255,0.96);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.9);
+
+            border-radius: 22px;
+
+            padding: 18px;
+
+            margin-bottom: 15px;
+
+            box-shadow:
+                0 8px 25px
+                rgba(45,60,100,0.08);
+
+        }
+
+
+        .card-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            margin:
+                0 0 16px;
+
+            font-size: 16px;
+
+            font-weight: 800;
+
+        }
+
+
+        .card-title-icon {
+
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #e9efff;
+
+            font-size: 19px;
+
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .field {
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .field:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            color:
+                #56627a;
+
+        }
+
+
+        .required {
+
+            color:
+                var(--pink);
+
+        }
+
+
+        input,
+        select,
+        textarea {
+
+            width: 100%;
+
+            border:
+                1px solid
+                #e1e6f0;
+
+            background:
+                #fbfcff;
+
+            color:
+                var(--dark);
+
+            border-radius: 13px;
+
+            padding:
+                12px 13px;
+
+            outline: none;
+
+            font-size: 14px;
+
+            transition:
+                border-color .18s,
+                box-shadow .18s,
+                background .18s;
+
+        }
+
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+
+            border-color:
+                var(--blue);
+
+            background: white;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(79,124,255,0.10);
+
+        }
+
+
+        textarea {
+
+            min-height: 80px;
+
+            resize:
+                vertical;
+
+        }
+
+
+        .student-select {
+
+            appearance: none;
+
+            background-image:
+                linear-gradient(
+                    45deg,
+                    transparent 50%,
+                    #7c879c 50%
+                ),
+                linear-gradient(
+                    135deg,
+                    #7c879c 50%,
+                    transparent 50%
+                );
+
+            background-position:
+                calc(100% - 18px) 18px,
+                calc(100% - 13px) 18px;
+
+            background-size:
+                5px 5px,
+                5px 5px;
+
+            background-repeat:
+                no-repeat;
+
+            padding-right: 38px;
+
+        }
+
+
+        /* =========================
+           STUDENT INFO
+        ========================= */
+
+        .student-info {
+
+            display: none;
+
+            margin-top: 10px;
+
+            padding: 12px;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f0f4ff,
+                    #f7f0ff
+                );
+
+        }
+
+
+        .student-info.show {
+
+            display: block;
+
+        }
+
+
+        .student-main {
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+        }
+
+
+        .student-meta {
+
+            margin-top: 4px;
+
+            font-size: 12px;
+
+            color:
+                var(--muted);
+
+        }
+
+
+        /* =========================
+           PAYMENT GRID
+        ========================= */
+
+        .payment-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 11px;
+
+        }
+
+
+        .payment-box {
+
+            padding: 13px;
+
+            border-radius: 15px;
+
+            background:
+                #fafbfe;
+
+            border:
+                1px solid
+                #e8ebf2;
+
+        }
+
+
+        .payment-box label {
+
+            margin-bottom: 6px;
+
+        }
+
+
+        .payment-box input {
+
+            background:
+                white;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+        }
+
+
+        .payment-box.cash {
+
+            border-top:
+                3px solid
+                var(--green);
+
+        }
+
+
+        .payment-box.transfer {
+
+            border-top:
+                3px solid
+                var(--blue);
+
+        }
+
+
+        .payment-box.qris {
+
+            border-top:
+                3px solid
+                var(--purple);
+
+        }
+
+
+        .payment-box.voucher {
+
+            border-top:
+                3px solid
+                var(--orange);
+
+        }
+
+
+        /* =========================
+           TOTAL
+        ========================= */
+
+        .total-box {
+
+            margin-top: 15px;
+
+            padding: 16px;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef4ff,
+                    #f4efff
+                );
+
+        }
+
+
+        .total-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+        }
+
+
+        .total-label {
+
+            font-size: 13px;
+
+            color:
+                var(--muted);
+
+        }
+
+
+        .total-value {
+
+            font-size: 23px;
+
+            font-weight: 900;
+
+            color:
+                var(--blue);
+
+        }
+
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .save-button {
+
+            width: 100%;
+
+            border: 0;
+
+            border-radius: 15px;
+
+            padding: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 8px 20px
+                rgba(79,124,255,0.22);
+
+            transition:
+                transform .15s,
+                opacity .15s;
+
+        }
+
+
+        .save-button:hover {
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        .save-button:active {
+
+            transform:
+                scale(.98);
+
+        }
+
+
+        .save-button:disabled {
+
+            opacity: .55;
+
+            cursor:
+                not-allowed;
+
+        }
+
+
+        .cancel-button {
+
+            width: 100%;
+
+            margin-top: 9px;
+
+            border:
+                1px solid
+                #e1e5ef;
+
+            border-radius: 14px;
+
+            padding: 12px;
+
+            background:
+                white;
+
+            color:
+                var(--muted);
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        .message {
+
+            display: none;
+
+            margin-bottom: 15px;
+
+            padding: 13px 15px;
+
+            border-radius: 14px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+        }
+
+
+        .message.show {
+
+            display: block;
+
+        }
+
+
+        .message.success {
+
+            background:
+                #e9f9f1;
+
+            color:
+                #23784f;
+
+        }
+
+
+        .message.error {
+
+            background:
+                #fff0f2;
+
+            color:
+                #a93649;
+
+        }
+
+
+        /* =========================
+           DESKTOP
+        ========================= */
+
+        @media (min-width: 700px) {
+
+            .header {
+
+                padding:
+                    27px 25px 65px;
+
+            }
+
+            .content {
+
+                padding:
+                    0 25px 50px;
+
+            }
+
+            .card {
+
+                padding: 22px;
+
+            }
+
+            .form-two {
+
+                display: grid;
+
+                grid-template-columns:
+                    1fr 1fr;
+
+                gap: 15px;
+
+            }
+
+            .form-two .field {
+
+                margin-bottom: 0;
+
+            }
+
+        }
+
+
+        @media (max-width: 390px) {
+
+            .payment-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+            .page-title {
+
+                font-size: 23px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="header">
+
+    <div class="header-content">
+
+        <div class="topbar">
+
+            <a
+                href="dashboard.html"
+                class="back-button"
+                aria-label="Kembali"
+            >
+                ←
+            </a>
+
+
+            <div class="brand">
+
+                <img
+                    src="icon.ico"
+                    alt="Bimbel Connect"
+                >
+
+                <span>
+                    Bimbel Connect
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <h1 class="page-title">
+            Pembayaran
+        </h1>
+
+        <p class="page-subtitle">
+            Catat transaksi pembayaran siswa
+        </p>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================
+     CONTENT
+========================= -->
+
+<main class="content">
+
+
+    <div
+        id="message"
+        class="message"
+    ></div>
+
+
+    <!-- =========================
+         DATA PEMBAYARAN
+    ========================== -->
+
+    <section class="card">
+
+        <h2 class="card-title">
+
+            <span class="card-title-icon">
+                👨‍🎓
+            </span>
+
+            Data Siswa
+
+        </h2>
+
+
+        <div class="field">
+
+            <label>
+                Siswa
+                <span class="required">*</span>
+            </label>
+
+
+            <select
+                id="siswa"
+                class="student-select"
+                required
+            >
+
+                <option value="">
+                    Memuat daftar siswa...
+                </option>
+
+            </select>
+
+
+            <div
+                id="studentInfo"
+                class="student-info"
+            >
+
+                <div
+                    id="studentMain"
+                    class="student-main"
+                ></div>
+
+                <div
+                    id="studentMeta"
+                    class="student-meta"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-two">
+
+            <div class="field">
+
+                <label>
+                    Tanggal
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="tanggal"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Kode Pembayaran
+                </label>
+
+                <input
+                    type="text"
+                    id="kode"
+                    placeholder="Otomatis"
+                    readonly
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         PEMBAYARAN
+    ========================== -->
+
+    <section class="card">
+
+        <h2 class="card-title">
+
+            <span class="card-title-icon">
+                💳
+            </span>
+
+            Pembayaran
+
+        </h2>
+
+
+        <div class="payment-grid">
+
+
+            <!-- TUNAI -->
+
+            <div class="payment-box cash">
+
+                <label>
+                    Tunai
+                </label>
+
+                <input
+                    type="number"
+                    id="tunai"
+                    min="0"
+                    step="1000"
+                    placeholder="Rp 0"
+                >
+
+            </div>
+
+
+            <!-- TRANSFER -->
+
+            <div class="payment-box transfer">
+
+                <label>
+                    Transfer
+                </label>
+
+                <input
+                    type="number"
+                    id="transfer"
+                    min="0"
+                    step="1000"
+                    placeholder="Rp 0"
+                >
+
+            </div>
+
+
+            <!-- QRIS -->
+
+            <div class="payment-box qris">
+
+                <label>
+                    QRIS
+                </label>
+
+                <input
+                    type="number"
+                    id="qris"
+                    min="0"
+                    step="1000"
+                    placeholder="Rp 0"
+                >
+
+            </div>
+
+
+            <!-- VOUCHER -->
+
+            <div class="payment-box voucher">
+
+                <label>
+                    Voucher
+                </label>
+
+                <input
+                    type="number"
+                    id="voucher"
+                    min="0"
+                    step="1000"
+                    placeholder="Rp 0"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL -->
+
+        <div class="total-box">
+
+            <div class="total-row">
+
+                <div>
+
+                    <div class="total-label">
+                        Total pembayaran
+                    </div>
+
+                    <div
+                        id="totalDisplay"
+                        class="total-value"
+                    >
+                        Rp 0
+                    </div>
+
+                </div>
+
+                <div style="font-size:28px;">
+                    💰
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         DETAIL PEMBAYARAN
+    ========================== -->
+
+    <section class="card">
+
+        <h2 class="card-title">
+
+            <span class="card-title-icon">
+                📝
+            </span>
+
+            Detail
+
+        </h2>
+
+
+        <div class="field">
+
+            <label>
+                Bank Transfer
+            </label>
+
+            <input
+                type="text"
+                id="transfer_bank"
+                placeholder="Contoh: BCA / BRI / Mandiri"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Keterangan Voucher
+            </label>
+
+            <input
+                type="text"
+                id="voucher_keterangan"
+                placeholder="Keterangan voucher (jika ada)"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Uang Kembali
+            </label>
+
+            <input
+                type="number"
+                id="uang_kembali"
+                min="0"
+                step="1000"
+                placeholder="Rp 0"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Catatan
+            </label>
+
+            <textarea
+                id="catatan"
+                placeholder="Catatan tambahan..."
+            ></textarea>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         SIMPAN
+    ========================== -->
+
+    <section class="card">
+
+        <button
+            id="saveButton"
+            class="save-button"
+        >
+            💾 Simpan Pembayaran
+        </button>
+
+
+        <button
+            id="cancelButton"
+            class="cancel-button"
+        >
+            Batal
+        </button>
+
+    </section>
+
+
+</main>
+
+
+
+<script>
+
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://ipnoshuvofomxwssamma.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_Q95e9ofqnDyPhavmx8GLSA_Dr3rnuj5";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+
+/* =====================================================
+   ELEMENT
+===================================================== */
+
+const siswaSelect =
+    document.getElementById("siswa");
+
+const studentInfo =
+    document.getElementById("studentInfo");
+
+const studentMain =
+    document.getElementById("studentMain");
+
+const studentMeta =
+    document.getElementById("studentMeta");
+
+const tanggalInput =
+    document.getElementById("tanggal");
+
+const kodeInput =
+    document.getElementById("kode");
+
+const saveButton =
+    document.getElementById("saveButton");
+
+const messageBox =
+    document.getElementById("message");
+
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let currentUser = null;
+
+let currentStaff = null;
+
+let students = [];
+
+
+
+/* =====================================================
+   FORMAT RUPIAH
+===================================================== */
+
+function formatRupiah(value) {
+
+    const number =
+        Number(value) || 0;
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }
+    ).format(number);
+
+}
+
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function showMessage(
+    text,
+    type = "success"
+) {
+
+    messageBox.textContent =
+        text;
+
+    messageBox.className =
+        "message show " + type;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+
+/* =====================================================
+   DEFAULT DATE
+===================================================== */
+
+function setDefaultDate() {
+
+    const today =
+        new Date();
+
+    const year =
+        today.getFullYear();
+
+    const month =
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            today.getDate()
+        ).padStart(2, "0");
+
+    tanggalInput.value =
+        `${year}-${month}-${day}`;
+
+}
+
+
+
+/* =====================================================
+   GENERATE KODE
+===================================================== */
+
+function generatePaymentCode() {
+
+    const now =
+        new Date();
+
+    const year =
+        now.getFullYear();
+
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            now.getDate()
+        ).padStart(2, "0");
+
+    const random =
+        Math.floor(
+            1000 +
+            Math.random() * 9000
+        );
+
+    return `BYR-${year}${month}${day}-${random}`;
+
+}
+
+
+
+/* =====================================================
+   CEK LOGIN
+===================================================== */
+
+async function checkLogin() {
+
+    const {
+        data: {
+            session
+        }
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if (!session) {
+
+        window.location.href =
+            "index.html";
+
+        return false;
+
+    }
+
+
+    currentUser =
+        session.user;
+
+
+    return true;
+
+}
+
+
+
+/* =====================================================
+   LOAD STAFF
+===================================================== */
+
+async function loadStaff() {
+
+    const email =
+        currentUser.email;
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("staff")
+            .select(
+                "kode, nama, email"
+            )
+            .eq(
+                "email",
+                email
+            )
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Staff error:",
+            error
+        );
+
+        return null;
+
+    }
+
+
+    currentStaff =
+        data;
+
+
+    return data;
+
+}
+
+
+
+/* =====================================================
+   LOAD SISWA + KELAS
+===================================================== */
+
+async function loadStudents() {
+
+    siswaSelect.innerHTML =
+        `<option value="">
+            Memuat daftar siswa...
+        </option>`;
+
+
+    /*
+     * Ambil master siswa
+     */
+
+    const {
+        data: siswaData,
+        error: siswaError
+    } =
+        await supabaseClient
+            .from("master_siswa")
+            .select(
+                "kode, nama, kelas"
+            )
+            .order(
+                "nama",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (siswaError) {
+
+        console.error(
+            "Master siswa:",
+            siswaError
+        );
+
+        throw siswaError;
+
+    }
+
+
+    /*
+     * Ambil master kelas
+     */
+
+    const {
+        data: kelasData,
+        error: kelasError
+    } =
+        await supabaseClient
+            .from("master_kelas")
+            .select(
+                "kode, nama, tingkat"
+            )
+            .order(
+                "tingkat",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (kelasError) {
+
+        console.error(
+            "Master kelas:",
+            kelasError
+        );
+
+        throw kelasError;
+
+    }
+
+
+    /*
+     * Buat map kelas
+     */
+
+    const kelasMap =
+        new Map();
+
+
+    kelasData.forEach(
+        kelas => {
+
+            kelasMap.set(
+                kelas.kode,
+                kelas
+            );
+
+        }
+    );
+
+
+    /*
+     * Gabungkan siswa + kelas
+     */
+
+    students =
+        siswaData.map(
+            siswa => {
+
+                const kelas =
+                    kelasMap.get(
+                        siswa.kelas
+                    );
+
+
+                return {
+
+                    kode:
+                        siswa.kode,
+
+                    nama:
+                        siswa.nama,
+
+                    kelasKode:
+                        siswa.kelas,
+
+                    kelasNama:
+                        kelas
+                            ? kelas.nama
+                            : "-",
+
+                    tingkat:
+                        kelas
+                            ? kelas.tingkat
+                            : "-"
+
+                };
+
+            }
+        );
+
+
+    /*
+     * Isi dropdown
+     */
+
+    siswaSelect.innerHTML =
+        `<option value="">
+            Pilih siswa...
+        </option>`;
+
+
+    students.forEach(
+        siswa => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                siswa.kode;
+
+
+            option.textContent =
+                `${siswa.kode} — ${siswa.nama} · ${siswa.kelasNama} · Tingkat ${siswa.tingkat}`;
+
+
+            siswaSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   SISWA DIPILIH
+===================================================== */
+
+siswaSelect.addEventListener(
+    "change",
+    function () {
+
+        const kode =
+            this.value;
+
+
+        const siswa =
+            students.find(
+                item =>
+                    item.kode === kode
+            );
+
+
+        if (!siswa) {
+
+            studentInfo.classList.remove(
+                "show"
+            );
+
+            return;
+
+        }
+
+
+        studentMain.textContent =
+            `${siswa.kode} — ${siswa.nama}`;
+
+
+        studentMeta.textContent =
+            `Kelas ${siswa.kelasNama} · Tingkat ${siswa.tingkat}`;
+
+
+        studentInfo.classList.add(
+            "show"
+        );
+
+    }
+);
+
+
+
+/* =====================================================
+   HITUNG TOTAL
+===================================================== */
+
+function calculateTotal() {
+
+    const tunai =
+        Number(
+            document.getElementById(
+                "tunai"
+            ).value
+        ) || 0;
+
+
+    const transfer =
+        Number(
+            document.getElementById(
+                "transfer"
+            ).value
+        ) || 0;
+
+
+    const qris =
+        Number(
+            document.getElementById(
+                "qris"
+            ).value
+        ) || 0;
+
+
+    const voucher =
+        Number(
+            document.getElementById(
+                "voucher"
+            ).value
+        ) || 0;
+
+
+    const total =
+        tunai +
+        transfer +
+        qris +
+        voucher;
+
+
+    document.getElementById(
+        "totalDisplay"
+    ).textContent =
+        formatRupiah(total);
+
+
+    return total;
+
+}
+
+
+
+/* =====================================================
+   PAYMENT INPUT LISTENER
+===================================================== */
+
+[
+    "tunai",
+    "transfer",
+    "qris",
+    "voucher"
+].forEach(
+    id => {
+
+        document
+            .getElementById(id)
+            .addEventListener(
+                "input",
+                calculateTotal
+            );
+
+    }
+);
+
+
+
+/* =====================================================
+   SIMPAN PEMBAYARAN
+===================================================== */
+
+async function savePayment() {
+
+    messageBox.className =
+        "message";
+
+
+    const siswa =
+        siswaSelect.value;
+
+
+    const tanggal =
+        tanggalInput.value;
+
+
+    if (!siswa) {
+
+        showMessage(
+            "Silakan pilih siswa terlebih dahulu.",
+            "error"
+        );
+
+        siswaSelect.focus();
+
+        return;
+
+    }
+
+
+    if (!tanggal) {
+
+        showMessage(
+            "Tanggal pembayaran wajib diisi.",
+            "error"
+        );
+
+        tanggalInput.focus();
+
+        return;
+
+    }
+
+
+    const total =
+        calculateTotal();
+
+
+    if (total <= 0) {
+
+        showMessage(
+            "Masukkan minimal satu nilai pembayaran.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    saveButton.disabled =
+        true;
+
+    saveButton.textContent =
+        "⏳ Menyimpan...";
+
+
+    try {
+
+        /*
+         * Pastikan staff sudah diketahui
+         */
+
+        if (!currentStaff) {
+
+            await loadStaff();
+
+        }
+
+
+        /*
+         * Kode staff untuk created_by
+         */
+
+        const createdBy =
+            currentStaff
+                ? currentStaff.kode
+                : currentUser.email;
+
+
+        /*
+         * Ambil nilai form
+         */
+
+        const paymentData = {
+
+            kode:
+                kodeInput.value,
+
+            tanggal:
+                tanggal,
+
+            siswa:
+                siswa,
+
+            tunai:
+                Number(
+                    document.getElementById(
+                        "tunai"
+                    ).value
+                ) || 0,
+
+            uang_kembali:
+                Number(
+                    document.getElementById(
+                        "uang_kembali"
+                    ).value
+                ) || 0,
+
+            transfer:
+                Number(
+                    document.getElementById(
+                        "transfer"
+                    ).value
+                ) || 0,
+
+            transfer_bank:
+                document.getElementById(
+                    "transfer_bank"
+                ).value
+                    .trim() || null,
+
+            qris:
+                Number(
+                    document.getElementById(
+                        "qris"
+                    ).value
+                ) || 0,
+
+            voucher:
+                Number(
+                    document.getElementById(
+                        "voucher"
+                    ).value
+                ) || 0,
+
+            voucher_keterangan:
+                document.getElementById(
+                    "voucher_keterangan"
+                ).value
+                    .trim() || null,
+
+            catatan:
+                document.getElementById(
+                    "catatan"
+                ).value
+                    .trim() || null,
+
+            batal:
+                false,
+
+            created_by:
+                createdBy,
+
+            updated_by:
+                createdBy
+
+        };
+
+
+        console.log(
+            "Data pembayaran:",
+            paymentData
+        );
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("pembayaran")
+                .insert(
+                    paymentData
+                )
+                .select()
+                .single();
+
+
+        if (error) {
+
+            console.error(
+                "Gagal menyimpan:",
+                error
+            );
+
+            throw error;
+
+        }
+
+
+        showMessage(
+            `Pembayaran berhasil disimpan. Kode: ${data.kode}`,
+            "success"
+        );
+
+
+        /*
+         * Reset form
+         */
+
+        resetForm();
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        showMessage(
+            "Gagal menyimpan pembayaran: " +
+            error.message,
+            "error"
+        );
+
+
+    } finally {
+
+        saveButton.disabled =
+            false;
+
+        saveButton.textContent =
+            "💾 Simpan Pembayaran";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   RESET FORM
+===================================================== */
+
+function resetForm() {
+
+    siswaSelect.value =
+        "";
+
+    studentInfo.classList.remove(
+        "show"
+    );
+
+
+    document.getElementById(
+        "tunai"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "transfer"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "qris"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "voucher"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "transfer_bank"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "voucher_keterangan"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "uang_kembali"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "catatan"
+    ).value =
+        "";
+
+
+    calculateTotal();
+
+
+    setDefaultDate();
+
+    kodeInput.value =
+        generatePaymentCode();
+
+}
+
+
+
+/* =====================================================
+   CANCEL
+===================================================== */
+
+document
+    .getElementById(
+        "cancelButton"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "dashboard.html";
+
+        }
+    );
+
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+saveButton.addEventListener(
+    "click",
+    savePayment
+);
+
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+async function init() {
+
+    try {
+
+        const loggedIn =
+            await checkLogin();
+
+
+        if (!loggedIn) {
+
+            return;
+
+        }
+
+
+        setDefaultDate();
+
+
+        kodeInput.value =
+            generatePaymentCode();
+
+
+        await loadStaff();
+
+
+        await loadStudents();
+
+
+    } catch (error) {
+
+        console.error(
+            "INIT ERROR:",
+            error
+        );
+
+
+        siswaSelect.innerHTML =
+            `<option value="">
+                Gagal memuat data siswa
+            </option>`;
+
+
+        showMessage(
+            "Gagal memuat data. Periksa koneksi Supabase dan RLS.",
+            "error"
+        );
+
+    }
+
+}
+
+
+init();
+
+</script>
+
+</body>
+
+</html>
