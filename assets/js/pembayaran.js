@@ -289,7 +289,7 @@
                 await supabaseClient
                     .from("master_siswa")
                     .select(
-                        "kode, nama, kelas"
+                        "kode, nama, kelas_kode"
                     )
                     .order(
                         "nama",
