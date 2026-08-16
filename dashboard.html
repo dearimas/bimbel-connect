@@ -895,7 +895,26 @@
                 .eq("email", email)
                 .maybeSingle();
 
+console.log("EMAIL LOGIN:", email);
+console.log("DATA STAFF:", staff);
+console.log("ERROR STAFF:", error);
 
+if (error) {
+    document.getElementById("staffName").textContent = "ERROR";
+    document.getElementById("staffDetail").textContent = error.message;
+    return;
+}
+
+if (!staff) {
+    document.getElementById("staffName").textContent = "STAFF TIDAK DITEMUKAN";
+    document.getElementById("staffDetail").textContent = email;
+    return;
+}
+
+document.getElementById("staffName").textContent = staff.nama;
+document.getElementById("staffDetail").textContent =
+    `${staff.kode} · ${staff.email}`;
+        
         if (error) {
 
             console.error(
