@@ -102,7 +102,7 @@ async function fetchReportData(startDate, endDate) {
     }
 
     return (Array.isArray(data) ? data : []).map((row) => ({
-        kode_pengeluaran: row.kode_pengeluaran,
+        kode_transaksi: row.kode_transaksi,
         tanggal: row.tanggal,
         keterangan: row.keterangan || "-",
         nominal: Number(row.nominal || 0),
