@@ -82,7 +82,7 @@ function renderRows(rows) {
         .map((row, index) => `
             <tr>
                 <td>${index + 1}</td>
-                <td><span class="badge">${row.kode_pengeluaran || "-"}</span></td>
+                <td><span class="badge">${row.kode_transaksi || "-"}</span></td>
                 <td>${formatDate(row.tanggal)}</td>
                 <td>${row.keterangan || "-"}</td>
                 <td class="currency">${formatRupiah(row.nominal)}</td>
