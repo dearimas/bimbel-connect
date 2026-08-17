@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bimbingan Belajar Connect - Laporan Fee Tentor</title>
+    <link rel="icon" type="image/x-icon" href="icon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="assets/css/laporan-fee-tentor.css">
+</head>
+
+<body>
+
+    <header class="top-section">
+        <div class="top-content">
+            <div class="brand-row">
+                <div class="brand">
+                    <img src="icon.ico" alt="Bimbel Connect">
+                    <span>Bimbingan Belajar Connect</span>
+                </div>
+
+                <a href="dashboard.html" class="back-button" aria-label="Kembali ke dashboard">
+                    ← Kembali
+                </a>
+            </div>
+
+            <div class="page-heading">
+                <div class="heading-icon">👨‍🏫</div>
+                <div>
+                    <h1>Laporan Fee Tentor</h1>
+                    <p>Laporan fee dan jam mengajar tentor berdasarkan periode tertentu.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+
+        <section class="card filter-card">
+            <h2 class="card-title">Filter Periode</h2>
+
+            <form id="filterForm">
+                <div class="filter-grid">
+                    <div class="field">
+                        <label for="tanggalAwal">Tanggal Awal</label>
+                        <input type="date" id="tanggalAwal" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="tanggalAkhir">Tanggal Akhir</label>
+                        <input type="date" id="tanggalAkhir" required>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="primary-btn">Tampilkan Laporan</button>
+                    <button type="button" id="resetFilter" class="secondary-btn">Reset</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="report-card">
+            <div class="report-topbar">
+                <div>
+                    <h2 class="card-title">Hasil Laporan</h2>
+                    <p id="periodeLabel" class="periode-label">Pilih tanggal untuk menampilkan laporan.</p>
+                </div>
+
+                <div class="summary-box">
+                    <span>Total Fee Tentor</span>
+                    <strong id="totalFeetentor">Rp 0</strong>
+                </div>
+            </div>
+
+            <div id="reportContainer" class="report-container"></div>
+        </section>
+
+    </main>
+
+    <!-- Modal Detail -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Detail Fee Tentor</h2>
+                <button type="button" class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Jenis Bimbingan</th>
+                                <th>Kode</th>
+                                <th>Siswa</th>
+                                <th>Keterangan</th>
+                                <th>Tarif</th>
+                                <th>Tipe</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px 0; border-top: 1px solid var(--line);">
+                        <span style="font-weight: 700; color: var(--muted);">TOTAL</span>
+                        <span id="detailTotal" style="font-size: 18px; font-weight: 800; color: var(--dark);">Rp
+                            0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/laporan-fee-tentor.js"></script>
+</body>
+
+</html>
