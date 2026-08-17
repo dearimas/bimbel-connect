@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bimbingan Belajar Connect - Laporan Pengeluaran</title>
+    <link rel="icon" type="image/x-icon" href="icon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="assets/css/laporan-pengeluaran.css">
+</head>
+
+<body>
+
+    <header class="top-section">
+        <div class="top-content">
+            <div class="brand-row">
+                <div class="brand">
+                    <img src="icon.ico" alt="Bimbel Connect">
+                    <span>Bimbingan Belajar Connect</span>
+                </div>
+
+                <a href="dashboard.html" class="back-button" aria-label="Kembali ke dashboard">
+                    ← Kembali
+                </a>
+            </div>
+
+            <div class="page-heading">
+                <div class="heading-icon">📊</div>
+                <div>
+                    <h1>Laporan Pengeluaran</h1>
+                    <p>Rekap pengeluaran berdasarkan periode tertentu.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+
+        <section class="card filter-card">
+            <h2 class="card-title">Filter Periode</h2>
+
+            <form id="filterForm">
+                <div class="filter-grid">
+                    <div class="field">
+                        <label for="tanggalAwal">Tanggal Awal</label>
+                        <input type="date" id="tanggalAwal" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="tanggalAkhir">Tanggal Akhir</label>
+                        <input type="date" id="tanggalAkhir" required>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="primary-btn">Tampilkan Laporan</button>
+                    <button type="button" id="resetFilter" class="secondary-btn">Reset</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card report-card">
+            <div class="report-topbar">
+                <div>
+                    <h2 class="card-title">Hasil Laporan</h2>
+                    <p id="periodeLabel" class="periode-label">Pilih tanggal untuk menampilkan laporan.</p>
+                </div>
+
+                <div class="summary-box">
+                    <span>Total Pengeluaran</span>
+                    <strong id="totalPengeluaran">Rp 0</strong>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode Pengeluaran</th>
+                            <th>Tanggal</th>
+                            <th>Detail</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">Belum ada data laporan untuk ditampilkan.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="report-footer">
+                <div class="report-footer-header">
+                    <div class="report-footer-label">Total Pengeluaran</div>
+                </div>
+                <div id="totalPengeluaranFooter" class="report-footer-value">Rp 0</div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="assets/js/laporan-pengeluaran.js"></script>
+</body>
+
+</html>

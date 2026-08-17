@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bimbingan Belajar Connect - Pengeluaran</title>
+    <link rel="icon" type="image/x-icon" href="icon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="assets/css/pengeluaran.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="topbar">
+                <a href="dashboard.html" class="back-button" aria-label="Kembali ke dashboard">
+                    ←
+                </a>
+
+                <div class="brand">
+                    <img src="icon.ico" alt="Bimbel Connect">
+                    <span>Bimbingan Belajar Connect</span>
+                </div>
+            </div>
+
+            <div class="profile-mini" id="staffProfile">
+                <div class="avatar">👤</div>
+                <div class="profile-text">
+                    <div class="profile-label">Staff</div>
+                    <div id="staffName">Memuat profil...</div>
+                </div>
+            </div>
+
+            <h1 class="page-title">Pengeluaran</h1>
+            <p class="page-subtitle">Catat pengeluaran bimbel dan rincian nominalnya.</p>
+        </div>
+    </header>
+
+    <main class="content">
+
+        <div id="message" class="message"></div>
+
+        <section class="card">
+            <h2 class="card-title">
+                <span class="card-title-icon">🧾</span>
+                Data Pengeluaran
+            </h2>
+
+            <div class="field">
+                <label>Kode Pengeluaran</label>
+                <input type="text" id="kode" placeholder="Otomatis setelah disimpan" readonly>
+            </div>
+
+            <div class="field">
+                <label>
+                    Tanggal
+                    <span class="required">*</span>
+                </label>
+                <input type="text" id="tanggal" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10"
+                    autocomplete="off" required>
+            </div>
+
+            <div class="field">
+                <label>Total Pengeluaran</label>
+                <input type="text" id="total_pengeluaran" value="Rp 0" readonly>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="card-title">
+                <span class="card-title-icon">📋</span>
+                Detail Pengeluaran
+            </h2>
+
+            <div id="detailRows" class="detail-rows"></div>
+
+            <div class="action-row">
+                <button type="button" id="addDetailBtn" class="primary-btn small-btn">+ Tambah Detail</button>
+            </div>
+
+            <div class="submit-row">
+                <button type="button" id="saveButton" class="primary-btn">Simpan Pengeluaran</button>
+                <button type="button" id="cancelButton" class="secondary-btn">Reset</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="assets/js/pengeluaran.js"></script>
+</body>
+
+</html>
