@@ -314,38 +314,79 @@ tbody tr:hover {
     font-style: italic;
 }
 
-.report-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+.report-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
     margin-top: 18px;
-    padding: 16px 18px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #fefce8, #eef7ff);
-    border: 1px solid rgba(255, 200, 87, 0.24);
-    flex-wrap: wrap;
 }
 
-.report-footer-header {
+.transaction-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 12px rgba(45, 60, 100, 0.06);
+}
+
+.transaction-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 12px;
 }
 
-.report-footer-label {
+.transaction-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.transaction-date {
     font-size: 13px;
-    font-weight: 800;
-    color: var(--dark);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    color: var(--muted);
 }
 
-.report-footer-value {
-    font-size: 26px;
-    font-weight: 800;
+.detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(102, 120, 160, 0.08);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-text {
+    flex: 1;
+    font-size: 14px;
     color: var(--dark);
+}
+
+.detail-nominal {
+    font-weight: 700;
+    color: var(--dark);
+    text-align: right;
+    min-width: 120px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-style: italic;
 }
 
 @media (max-width: 768px) {

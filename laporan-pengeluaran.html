@@ -60,7 +60,7 @@
             </form>
         </section>
 
-        <section class="card report-card">
+        <section class="report-card">
             <div class="report-topbar">
                 <div>
                     <h2 class="card-title">Hasil Laporan</h2>
@@ -73,31 +73,7 @@
                 </div>
             </div>
 
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Kode Pengeluaran</th>
-                            <th>Tanggal</th>
-                            <th>Detail</th>
-                            <th>Nominal</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reportTableBody">
-                        <tr>
-                            <td colspan="5" class="empty-state">Belum ada data laporan untuk ditampilkan.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="report-footer">
-                <div class="report-footer-header">
-                    <div class="report-footer-label">Total Pengeluaran</div>
-                </div>
-                <div id="totalPengeluaranFooter" class="report-footer-value">Rp 0</div>
-            </div>
+            <div id="reportContainer" class="report-container"></div>
         </section>
 
     </main>

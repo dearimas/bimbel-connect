@@ -10,9 +10,8 @@ const filterForm = document.getElementById("filterForm");
 const tanggalAwalInput = document.getElementById("tanggalAwal");
 const tanggalAkhirInput = document.getElementById("tanggalAkhir");
 const resetFilterButton = document.getElementById("resetFilter");
-const reportTableBody = document.getElementById("reportTableBody");
+const reportContainer = document.getElementById("reportContainer");
 const totalPengeluaranEl = document.getElementById("totalPengeluaran");
-const totalPengeluaranFooterEl = document.getElementById("totalPengeluaranFooter");
 const periodeLabel = document.getElementById("periodeLabel");
 
 function formatRupiah(value) {
@@ -41,6 +40,13 @@ function formatDate(value) {
     }).format(date);
 }
 
+function convertDateToFunctionFormat(isoDate) {
+    if (!isoDate) return "";
+
+    const [year, month, day] = isoDate.split("-");
+    return `${Number(month)}/${Number(day)}/${year}`;
+}
+
 function setDefaultRange() {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -58,14 +64,10 @@ function setDefaultRange() {
 }
 
 function renderEmptyState() {
-    reportTableBody.innerHTML = `
-        <tr>
-            <td colspan="5" class="empty-state">Belum ada data laporan untuk ditampilkan.</td>
-        </tr>
+    reportContainer.innerHTML = `
+        <div class="empty-state">Belum ada data laporan untuk ditampilkan.</div>
     `;
-
     totalPengeluaranEl.textContent = formatRupiah(0);
-    totalPengeluaranFooterEl.textContent = formatRupiah(0);
 }
 
 function renderRows(rows) {
@@ -74,32 +76,85 @@ function renderRows(rows) {
         return;
     }
 
+    const groupedByCode = {};
+
+    rows.forEach((row) => {
+        const code = row.kode_transaksi || "Unknown";
+
+        if (!groupedByCode[code]) {
+            groupedByCode[code] = {
+                kode_transaksi: code,
+                tanggal: row.tanggal,
+                details: [],
+            };
+        }
+
+        groupedByCode[code].details.push({
+            keterangan: row.keterangan || "-",
+            nominal: Number(row.nominal || 0),
+        });
+    });
+
     const totalPengeluaran = rows.reduce((sum, item) => sum + Number(item.nominal || 0), 0);
     totalPengeluaranEl.textContent = formatRupiah(totalPengeluaran);
-    totalPengeluaranFooterEl.textContent = formatRupiah(totalPengeluaran);
 
-    reportTableBody.innerHTML = rows
-        .map((row, index) => `
-            <tr>
-                <td>${index + 1}</td>
-                <td><span class="badge">${row.kode_transaksi || "-"}</span></td>
-                <td>${formatDate(row.tanggal)}</td>
-                <td>${row.keterangan || "-"}</td>
-                <td class="currency">${formatRupiah(row.nominal)}</td>
-            </tr>
-        `)
+    reportContainer.innerHTML = Object.values(groupedByCode)
+        .map((group) => {
+            const totalNominal = group.details.reduce(
+                (sum, detail) => sum + detail.nominal,
+                0
+            );
+
+            return `
+                <div class="transaction-card">
+                    <div class="transaction-header">
+                        <div class="transaction-code">
+                            <span>${group.kode_transaksi}</span>
+                        </div>
+                        <div class="transaction-date">${formatDate(group.tanggal)}</div>
+                    </div>
+
+                    <div class="detail-list">
+                        ${group.details
+                    .map(
+                        (detail) => `
+                            <div class="detail-item">
+                                <div class="detail-text">${detail.keterangan}</div>
+                                <div class="detail-nominal">${formatRupiah(detail.nominal)}</div>
+                            </div>
+                        `
+                    )
+                    .join("")}
+                    </div>
+
+                    <div style="padding-top: 12px; border-top: 1px solid var(--line); margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700; color: var(--muted); font-size: 13px;">TOTAL TRANSAKSI</span>
+                        <span style="font-size: 18px; font-weight: 800; color: var(--dark);">${formatRupiah(
+                        totalNominal
+                    )}</span>
+                    </div>
+                </div>
+            `;
+        })
         .join("");
 }
 
 async function fetchReportData(startDate, endDate) {
+    const startDateFormatted = convertDateToFunctionFormat(startDate);
+    const endDateFormatted = convertDateToFunctionFormat(endDate);
+
+    console.log(`Calling laporan_pengeluaran('${startDateFormatted}', '${endDateFormatted}')`);
+
     const { data, error } = await supabaseClient.rpc("laporan_pengeluaran", {
-        p_tanggalawal: startDate,
-        p_tanggalakhir: endDate,
+        p_tanggalawal: startDateFormatted,
+        p_tanggalakhir: endDateFormatted,
     });
 
     if (error) {
         throw error;
     }
+
+    console.log("Response data:", data);
 
     return (Array.isArray(data) ? data : []).map((row) => ({
         kode_transaksi: row.kode_transaksi,
