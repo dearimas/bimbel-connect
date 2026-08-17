@@ -226,20 +226,6 @@ function renderRows(rows) {
                             </div>
 
                         </div>
-
-
-                        <div class="tentor-total">
-
-                            <span>
-                                TOTAL FEE
-                            </span>
-
-                            <strong>
-                                ${formatRupiah(tentor.total_fee)}
-                            </strong>
-
-                        </div>
-
                     </div>
 
 
