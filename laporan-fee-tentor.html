@@ -2,74 +2,37 @@
 <html lang="id">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>Bimbingan Belajar Connect - Laporan Fee Tentor</title>
 
-    <title>
-        Bimbingan Belajar Connect - Laporan Fee Tentor
-    </title>
+    <link rel="icon" type="image/x-icon" href="icon.ico">
 
-    <link
-        rel="icon"
-        type="image/x-icon"
-        href="icon.ico"
-    >
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-    <link
-        rel="stylesheet"
-        href="assets/css/laporan-fee-tentor.css"
-    >
-
+    <link rel="stylesheet" href="assets/css/laporan-fee-tentor.css">
 </head>
-
 
 <body>
 
-
-    <!-- =========================
-         HEADER
-    ========================== -->
-
+    <!-- HEADER -->
     <header class="top-section">
 
         <div class="top-content">
 
-
             <div class="brand-row">
 
                 <div class="brand">
-
-                    <img
-                        src="icon.ico"
-                        alt="Bimbel Connect"
-                    >
-
-                    <span>
-                        Bimbingan Belajar Connect
-                    </span>
-
+                    <img src="icon.ico" alt="Bimbel Connect">
+                    <span>Bimbingan Belajar Connect</span>
                 </div>
 
-
-                <a
-                    href="dashboard.html"
-                    class="back-button"
-                    aria-label="Kembali ke dashboard"
-                >
+                <a href="dashboard.html" class="back-button">
                     ← Kembali
                 </a>
 
             </div>
-
 
             <div class="page-heading">
 
@@ -77,17 +40,12 @@
                     👨‍🏫
                 </div>
 
-
                 <div>
-
-                    <h1>
-                        Laporan Fee Tentor
-                    </h1>
+                    <h1>Laporan Fee Tentor</h1>
 
                     <p>
                         Laporan fee dan jam mengajar tentor berdasarkan periode tertentu.
                     </p>
-
                 </div>
 
             </div>
@@ -97,27 +55,18 @@
     </header>
 
 
-
-    <!-- =========================
-         CONTENT
-    ========================== -->
-
     <main class="content">
 
-
         <!-- FILTER -->
-
         <section class="card filter-card">
 
             <h2 class="card-title">
                 Filter Periode
             </h2>
 
-
             <form id="filterForm">
 
                 <div class="filter-grid">
-
 
                     <div class="field">
 
@@ -148,7 +97,6 @@
 
                     </div>
 
-
                 </div>
 
 
@@ -160,7 +108,6 @@
                     >
                         Tampilkan Laporan
                     </button>
-
 
                     <button
                         type="button"
@@ -177,11 +124,8 @@
         </section>
 
 
-
         <!-- REPORT -->
-
-        <section class="card report-card">
-
+        <section class="report-card">
 
             <div class="report-topbar">
 
@@ -197,51 +141,142 @@
                     >
                         Pilih tanggal untuk menampilkan laporan.
                     </p>
-                    
-                    <p id="lastUpdateLabel" class="last-update-label">
-    Last update: -
-</p>
 
                 </div>
 
 
-                <div class="summary-box">
+                <div class="report-summary">
 
-                    <span>
-                        Total Fee Semua Tentor
-                    </span>
+                    <div class="summary-box">
 
-                    <strong id="totalFeetentor">
-                        Rp 0
-                    </strong>
+                        <span>
+                            Total Fee
+                        </span>
+
+                        <strong id="totalFee">
+                            Rp 0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="update-box">
+
+                        <span>
+                            Data KBM terakhir diperbarui
+                        </span>
+
+                        <strong id="lastUpdate">
+                            -
+                        </strong>
+
+                    </div>
 
                 </div>
 
             </div>
 
 
-            <!--
-                Di sinilah semua card tentor
-                akan dibuat oleh JavaScript.
-            -->
-
+            <!-- CARD TENTOR -->
             <div
                 id="reportContainer"
                 class="report-container"
             ></div>
 
-
         </section>
-
 
     </main>
 
 
+    <!-- MODAL DETAIL -->
+    <div
+        id="detailModal"
+        class="modal"
+    >
 
-    <script
-        src="assets/js/laporan-fee-tentor.js"
-    ></script>
+        <div class="modal-content">
 
+            <div class="modal-header">
+
+                <div>
+
+                    <h2 id="modalTitle">
+                        Detail Fee Tentor
+                    </h2>
+
+                    <p id="modalSubtitle">
+                        -
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeModal"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="detail-table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Jenis Bimbingan</th>
+                                <th>Kode</th>
+                                <th>Siswa</th>
+                                <th>Keterangan</th>
+                                <th>Fee</th>
+                                <th>Tipe</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="detailTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <div class="detail-total">
+
+                        <span>
+                            TOTAL
+                        </span>
+
+                        <strong id="detailTotal">
+                            Rp 0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="assets/js/laporan-fee-tentor.js"></script>
 
 </body>
 
