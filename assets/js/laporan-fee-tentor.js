@@ -1,274 +1,417 @@
-const SUPABASE_URL = "https://ipnoshuvofomxwssamma.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Q95e9ofqnDyPhavmx8GLSA_Dr3rnuj5";
+const SUPABASE_URL =
+    "https://ipnoshuvofomxwssamma.supabase.co";
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const SUPABASE_KEY =
+    "sb_publishable_Q95e9ofqnDyPhavmx8GLSA_Dr3rnuj5";
 
-// ======================================================
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+// =========================================================
 // ELEMENT
-// ======================================================
+// =========================================================
 
-const filterForm = document.getElementById("filterForm");
-const tanggalAwalInput = document.getElementById("tanggalAwal");
-const tanggalAkhirInput = document.getElementById("tanggalAkhir");
-const resetFilterButton = document.getElementById("resetFilter");
+const filterForm =
+    document.getElementById("filterForm");
 
-const reportContainer = document.getElementById("reportContainer");
-const totalFeetentorEl = document.getElementById("totalFeetentor");
+const tanggalAwalInput =
+    document.getElementById("tanggalAwal");
 
-const periodeLabel = document.getElementById("periodeLabel");
-const lastUpdateLabel = document.getElementById("lastUpdateLabel");
+const tanggalAkhirInput =
+    document.getElementById("tanggalAkhir");
+
+const resetFilterButton =
+    document.getElementById("resetFilter");
+
+const reportContainer =
+    document.getElementById("reportContainer");
+
+const periodeLabel =
+    document.getElementById("periodeLabel");
+
+const totalFeeElement =
+    document.getElementById("totalFee");
+
+const lastUpdateElement =
+    document.getElementById("lastUpdate");
 
 
-// ======================================================
+// Modal
+
+const detailModal =
+    document.getElementById("detailModal");
+
+const closeModalButton =
+    document.getElementById("closeModal");
+
+const modalTitle =
+    document.getElementById("modalTitle");
+
+const modalSubtitle =
+    document.getElementById("modalSubtitle");
+
+const detailTableBody =
+    document.getElementById("detailTableBody");
+
+const detailTotal =
+    document.getElementById("detailTotal");
+
+
+// =========================================================
 // FORMAT RUPIAH
-// ======================================================
+// =========================================================
 
 function formatRupiah(value) {
-    const nominal = Number(value) || 0;
 
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        maximumFractionDigits: 0,
-    }).format(nominal);
+    const nominal =
+        Number(value) || 0;
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }
+    ).format(nominal);
 }
 
 
-// ======================================================
-// FORMAT TANGGAL
-// ======================================================
+// =========================================================
+// FORMAT DATE
+// =========================================================
 
 function formatDate(value) {
-    if (!value) return "-";
 
-    const date = new Date(`${value}T00:00:00`);
+    if (!value) {
+        return "-";
+    }
+
+    const date =
+        new Date(`${value}T00:00:00`);
 
     if (Number.isNaN(date.getTime())) {
         return value;
     }
 
-    return new Intl.DateTimeFormat("id-ID", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-    }).format(date);
+    return new Intl.DateTimeFormat(
+        "id-ID",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    ).format(date);
 }
 
 
-// ======================================================
-// FORMAT TANGGAL + JAM
-// Untuk Last Update
-// ======================================================
+// =========================================================
+// FORMAT DATETIME
+// =========================================================
 
 function formatDateTime(value) {
-    if (!value) return "-";
 
-    const date = new Date(value);
+    if (!value) {
+        return "-";
+    }
+
+    const date =
+        new Date(value);
 
     if (Number.isNaN(date.getTime())) {
         return value;
     }
 
-    return new Intl.DateTimeFormat("id-ID", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    }).format(date);
+    return new Intl.DateTimeFormat(
+        "id-ID",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    ).format(date);
 }
 
 
-// ======================================================
-// DEFAULT PERIODE
-// ======================================================
+// =========================================================
+// DEFAULT DATE
+// =========================================================
 
 function setDefaultRange() {
-    const now = new Date();
 
-    const firstDay = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        1
-    );
+    const now =
+        new Date();
 
-    const lastDay = new Date(
-        now.getFullYear(),
-        now.getMonth() + 1,
-        0
-    );
+    const firstDay =
+        new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            1
+        );
 
-    const formatDateForInput = (date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
+    const lastDay =
+        new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            0
+        );
+
+
+    function formatInputDate(date) {
+
+        const year =
+            date.getFullYear();
+
+        const month =
+            String(
+                date.getMonth() + 1
+            ).padStart(2, "0");
+
+        const day =
+            String(
+                date.getDate()
+            ).padStart(2, "0");
 
         return `${year}-${month}-${day}`;
-    };
-
-    tanggalAwalInput.value = formatDateForInput(firstDay);
-    tanggalAkhirInput.value = formatDateForInput(lastDay);
-}
-
-
-// ======================================================
-// RESET LAST UPDATE
-// ======================================================
-
-function resetLastUpdate() {
-    if (lastUpdateLabel) {
-        lastUpdateLabel.textContent = "Last update: -";
     }
+
+
+    tanggalAwalInput.value =
+        formatInputDate(firstDay);
+
+    tanggalAkhirInput.value =
+        formatInputDate(lastDay);
 }
 
 
-// ======================================================
-// EMPTY STATE
-// ======================================================
+// =========================================================
+// EMPTY
+// =========================================================
 
 function renderEmptyState() {
+
     reportContainer.innerHTML = `
         <div class="empty-state">
-            <div class="empty-icon">📋</div>
-            <div>Belum ada data fee tentor untuk periode ini.</div>
+            Belum ada data laporan untuk ditampilkan.
         </div>
     `;
 
-    totalFeetentorEl.textContent = formatRupiah(0);
+    totalFeeElement.textContent =
+        formatRupiah(0);
 
-    resetLastUpdate();
+    lastUpdateElement.textContent =
+        "-";
 }
 
 
-// ======================================================
-// FETCH LAPORAN DARI SUPABASE
-// ======================================================
+// =========================================================
+// ESCAPE HTML
+// =========================================================
 
-async function fetchReportData(startDate, endDate) {
+function escapeHtml(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+// =========================================================
+// GET INITIAL
+// =========================================================
+
+function getInitialName(name) {
+
+    if (!name) {
+        return "👨‍🏫";
+    }
+
+    return name
+        .trim()
+        .charAt(0)
+        .toUpperCase();
+}
+
+
+// =========================================================
+// FETCH LAPORAN UTAMA
+// =========================================================
+
+async function fetchReportData(
+    startDate,
+    endDate
+) {
 
     console.log(
-        `Calling laporan_fee_tentor('${startDate}', '${endDate}')`
+        "Calling laporan_fee_tentor:",
+        startDate,
+        endDate
     );
 
-    const { data, error } = await supabaseClient.rpc(
+
+    const {
+        data,
+        error
+    } = await supabaseClient.rpc(
         "laporan_fee_tentor",
         {
             p_awal: startDate,
-            p_akhir: endDate,
+            p_akhir: endDate
         }
     );
+
 
     if (error) {
         throw error;
     }
 
-    console.log("Response data:", data);
 
-    return Array.isArray(data) ? data : [];
+    console.log(
+        "Response laporan fee:",
+        data
+    );
+
+
+    return Array.isArray(data)
+        ? data
+        : [];
 }
 
 
-// ======================================================
-// GROUP DATA BERDASARKAN TENTOR
-//
-// Satu tentor = satu card.
-//
-// Contoh:
-//
-// T36 | Dimas | Coding - SD 4 | fee 100.000
-// T36 | Dimas | Reguler - SD 4 | fee 150.000
-// T11 | Indah | Privat - SD 2 | fee 50.000
-//
-// Menjadi:
-//
-// T36
-//   Coding
-//   Reguler
-//
-// T11
-//   Privat
-// ======================================================
+// =========================================================
+// GROUP BY TENTOR
+// =========================================================
 
 function groupByTentor(rows) {
 
     const grouped = {};
 
-    rows.forEach((row) => {
 
-        const kode = row.tentor_kode;
+    rows.forEach(row => {
+
+        const kode =
+            row.tentor_kode;
+
 
         if (!grouped[kode]) {
 
             grouped[kode] = {
-                tentor_kode: row.tentor_kode,
-                tentor: row.tentor,
 
-                total_fee: 0,
+                tentor_kode:
+                    row.tentor_kode,
+
+                tentor:
+                    row.tentor,
+
                 total_kbm: 0,
+
                 total_jam_kosong: 0,
+
                 total_mengajar: 0,
 
-                details: [],
+                total_fee: 0,
+
+                last_update:
+                    row.last_update,
+
+                details: []
+
             };
+
         }
 
 
-        const fee = Number(row.fee || 0);
+        const item =
+            grouped[kode];
 
-        const totalKbm =
+
+        item.total_kbm +=
             Number(row.total_kbm || 0);
 
-        const jamKosong =
-            Number(row.total_jam_kosong || 0);
+        item.total_jam_kosong +=
+            Number(
+                row.total_jam_kosong || 0
+            );
 
-        const mengajar =
-            Number(row.total_mengajar || 0);
-
-
-        // ==================================================
-        // TOTAL FEE TENTOR
-        //
-        // Jangan menggunakan row.total_fee_tentor.
-        //
-        // Karena total_fee_tentor berasal dari window
-        // function dan nilainya dapat muncul berulang
-        // pada setiap jenis bimbingan.
-        //
-        // Kita cukup jumlahkan fee setiap detail.
-        // ==================================================
-
-        grouped[kode].total_fee += fee;
-
-        grouped[kode].total_kbm += totalKbm;
-
-        grouped[kode].total_jam_kosong += jamKosong;
-
-        grouped[kode].total_mengajar += mengajar;
+        item.total_mengajar +=
+            Number(
+                row.total_mengajar || 0
+            );
 
 
-        grouped[kode].details.push({
+        /*
+         * PENTING:
+         *
+         * Yang dijumlahkan adalah FEE
+         * per jenis bimbingan.
+         *
+         * Bukan total_fee_tentor.
+         */
+
+        item.total_fee +=
+            Number(row.fee || 0);
+
+
+        item.details.push({
 
             jenis_bimbingan:
-                row.jenis_bimbingan || "-",
-
-            tingkat:
-                row.tingkat || "-",
+                row.jenis_bimbingan,
 
             total_kbm:
-                totalKbm,
+                Number(row.total_kbm || 0),
 
             total_jam_kosong:
-                jamKosong,
+                Number(
+                    row.total_jam_kosong || 0
+                ),
 
             total_mengajar:
-                mengajar,
+                Number(
+                    row.total_mengajar || 0
+                ),
 
             fee:
-                fee,
+                Number(row.fee || 0),
+
+            tingkat:
+                row.tingkat
+
         });
+
+
+        /*
+         * Ambil last_update terbesar
+         * dari semua baris tentor.
+         */
+
+        if (
+            row.last_update &&
+            (
+                !item.last_update ||
+                new Date(row.last_update) >
+                new Date(item.last_update)
+            )
+        ) {
+
+            item.last_update =
+                row.last_update;
+
+        }
+
     });
 
 
@@ -276,68 +419,9 @@ function groupByTentor(rows) {
 }
 
 
-// ======================================================
-// UPDATE LAST UPDATE
-// ======================================================
-//
-// last_update berasal dari FUNCTION Supabase.
-//
-// Karena function mengambil MAX(created_at) dari KBM
-// pada periode yang dipilih, maka cukup mengambil
-// nilai last_update dari salah satu row.
-//
-// Jika function mengembalikan nilai yang sama untuk
-// setiap row, hasilnya tetap konsisten.
-// ======================================================
-
-function updateLastUpdate(rows) {
-
-    if (!lastUpdateLabel) {
-        return;
-    }
-
-    if (!rows.length) {
-        lastUpdateLabel.textContent =
-            "Last update: Belum ada data";
-
-        return;
-    }
-
-
-    const lastUpdates = rows
-        .map((row) => row.last_update)
-        .filter(Boolean)
-        .map((value) => new Date(value))
-        .filter((date) => !Number.isNaN(date.getTime()));
-
-
-    if (!lastUpdates.length) {
-
-        lastUpdateLabel.textContent =
-            "Last update: -";
-
-        return;
-    }
-
-
-    // Ambil tanggal paling baru dari seluruh row.
-    const latest = new Date(
-        Math.max(
-            ...lastUpdates.map(
-                (date) => date.getTime()
-            )
-        )
-    );
-
-
-    lastUpdateLabel.textContent =
-        `Last update: ${formatDateTime(latest)}`;
-}
-
-
-// ======================================================
-// RENDER CARD TENTOR
-// ======================================================
+// =========================================================
+// RENDER LAPORAN
+// =========================================================
 
 function renderRows(rows) {
 
@@ -353,54 +437,105 @@ function renderRows(rows) {
         groupByTentor(rows);
 
 
-    // ==================================================
-    // GRAND TOTAL SELURUH TENTOR
-    // ==================================================
+    /*
+     * Total keseluruhan laporan.
+     *
+     * Menggunakan total_fee masing-masing tentor.
+     */
 
-    const grandTotal =
+    const totalLaporan =
         tentorList.reduce(
             (sum, tentor) =>
-                sum + tentor.total_fee,
+                sum +
+                Number(
+                    tentor.total_fee || 0
+                ),
             0
         );
 
 
-    totalFeetentorEl.textContent =
-        formatRupiah(grandTotal);
+    totalFeeElement.textContent =
+        formatRupiah(totalLaporan);
 
 
-    // ==================================================
-    // RENDER CARD
-    // ==================================================
+    /*
+     * Ambil last update terbesar
+     * dari seluruh laporan.
+     */
+
+    let globalLastUpdate = null;
+
+
+    tentorList.forEach(tentor => {
+
+        if (!tentor.last_update) {
+            return;
+        }
+
+
+        if (
+            !globalLastUpdate ||
+            new Date(tentor.last_update) >
+            new Date(globalLastUpdate)
+        ) {
+
+            globalLastUpdate =
+                tentor.last_update;
+
+        }
+
+    });
+
+
+    lastUpdateElement.textContent =
+        globalLastUpdate
+            ? formatDateTime(globalLastUpdate)
+            : "-";
+
+
+    /*
+     * Render card tentor.
+     */
 
     reportContainer.innerHTML =
-        tentorList
-            .map((tentor) => {
+        tentorList.map(
+            tentor => {
+
+                const detailRows =
+                    tentor.details;
+
 
                 return `
-                    <div class="tentor-card">
+                    <div
+                        class="tentor-card"
+                    >
 
-                        <!-- ==================================
-                             HEADER TENTOR
-                        =================================== -->
+                        <!-- HEADER TENTOR -->
+                        <div class="tentor-header">
 
-                        <div class="tentor-card-header">
-
-                            <div class="tentor-profile">
+                            <div class="tentor-info">
 
                                 <div class="tentor-avatar">
-                                    👨‍🏫
+                                    ${escapeHtml(
+                                        getInitialName(
+                                            tentor.tentor
+                                        )
+                                    )}
                                 </div>
 
                                 <div>
 
-                                    <div class="tentor-name">
-                                        ${tentor.tentor || "-"}
-                                    </div>
+                                    <h3 class="tentor-name">
+                                        ${escapeHtml(
+                                            tentor.tentor
+                                        )}
+                                    </h3>
 
                                     <div class="tentor-code">
                                         Kode Tentor:
-                                        ${tentor.tentor_kode || "-"}
+                                        ${escapeHtml(
+                                            tentor.tentor_kode
+                                        )}
                                     </div>
 
                                 </div>
@@ -408,111 +543,105 @@ function renderRows(rows) {
                             </div>
 
 
-                            <!-- TOTAL FEE TENTOR -->
+                            <div class="tentor-header-actions">
 
-                            <div class="tentor-total-fee">
-
-                                <span>
-                                    Total Fee
-                                </span>
-
-                                <strong>
-                                    ${formatRupiah(
-                                        tentor.total_fee
-                                    )}
-                                </strong>
+                                <button
+                                    type="button"
+                                    class="detail-btn"
+                                    data-tentor-kode="${escapeHtml(
+                                        tentor.tentor_kode
+                                    )}"
+                                    data-tentor-nama="${escapeHtml(
+                                        tentor.tentor
+                                    )}"
+                                >
+                                    Detail
+                                </button>
 
                             </div>
 
                         </div>
 
 
-                        <!-- ==================================
-                             SUMMARY
-                        =================================== -->
+                        <!-- STATISTIK -->
+                        <div class="tentor-stats">
 
-                        <div class="tentor-summary">
+                            <div class="stat-box">
 
-                            <div class="summary-item">
-
-                                <span>
+                                <span class="stat-label">
                                     Total KBM
                                 </span>
 
-                                <strong>
+                                <span class="stat-value">
                                     ${tentor.total_kbm}
-                                </strong>
+                                </span>
 
                             </div>
 
 
-                            <div class="summary-item">
+                            <div class="stat-box">
 
-                                <span>
+                                <span class="stat-label">
                                     Jam Efektif
                                 </span>
 
-                                <strong>
+                                <span class="stat-value">
                                     ${tentor.total_mengajar}
-                                </strong>
+                                </span>
 
                             </div>
 
 
-                            <div class="summary-item">
+                            <div class="stat-box">
 
-                                <span>
+                                <span class="stat-label">
                                     Jam Kosong
                                 </span>
 
-                                <strong>
+                                <span class="stat-value">
                                     ${tentor.total_jam_kosong}
-                                </strong>
+                                </span>
 
                             </div>
 
 
-                            <div class="summary-item fee-summary">
+                            <div class="stat-box">
 
-                                <span>
+                                <span class="stat-label">
                                     Perolehan
                                 </span>
 
-                                <strong>
+                                <span class="stat-value fee">
                                     ${formatRupiah(
                                         tentor.total_fee
                                     )}
-                                </strong>
+                                </span>
 
                             </div>
 
                         </div>
 
 
-                        <!-- ==================================
-                             DETAIL BIMBINGAN
-                        =================================== -->
+                        <!-- DETAIL BIMBINGAN -->
+                        <div class="bimbingan-section">
 
-                        <div class="tentor-detail">
+                            <div class="bimbingan-title-row">
 
-                            <div class="detail-title">
-
-                                <span>
+                                <h4 class="bimbingan-title">
                                     Detail Bimbingan
-                                </span>
+                                </h4>
 
-                                <span>
-                                    ${tentor.details.length} jenis
+                                <span class="jumlah-jenis">
+                                    ${detailRows.length}
+                                    jenis
                                 </span>
 
                             </div>
 
 
-                            <div class="detail-table">
+                            <div class="bimbingan-table">
 
-                                <!-- HEADER -->
-
-                                <div class="detail-row detail-head">
+                                <div class="bimbingan-row header">
 
                                     <div>
                                         Jenis Bimbingan
@@ -537,52 +666,52 @@ function renderRows(rows) {
                                 </div>
 
 
-                                <!-- DETAIL -->
+                                ${detailRows
+                                    .map(
+                                        detail => `
+                                            <div class="bimbingan-row">
 
-                                ${tentor.details
-                                    .map((detail) => {
+                                                <div>
 
-                                        return `
-                                            <div class="detail-row">
+                                                    <div class="bimbingan-name">
+                                                        ${escapeHtml(
+                                                            detail.jenis_bimbingan
+                                                        )}
+                                                    </div>
 
-                                                <div class="jenis-bimbingan">
-
-                                                    <strong>
-                                                        ${detail.jenis_bimbingan}
-                                                    </strong>
-
-                                                    <small>
-                                                        ${detail.tingkat}
-                                                    </small>
+                                                    <span class="bimbingan-level">
+                                                        ${escapeHtml(
+                                                            detail.tingkat || ""
+                                                        )}
+                                                    </span>
 
                                                 </div>
 
 
-                                                <div>
+                                                <div class="bimbingan-number">
                                                     ${detail.total_kbm}
                                                 </div>
 
 
-                                                <div>
+                                                <div class="bimbingan-number">
                                                     ${detail.total_jam_kosong}
                                                 </div>
 
 
-                                                <div>
+                                                <div class="bimbingan-number">
                                                     ${detail.total_mengajar}
                                                 </div>
 
 
-                                                <div class="detail-fee">
+                                                <div class="bimbingan-fee">
                                                     ${formatRupiah(
                                                         detail.fee
                                                     )}
                                                 </div>
 
                                             </div>
-                                        `;
-
-                                    })
+                                        `
+                                    )
                                     .join("")}
 
                             </div>
@@ -591,26 +720,382 @@ function renderRows(rows) {
 
                     </div>
                 `;
+            }
+        ).join("");
 
-            })
-            .join("");
+
+    /*
+     * Pasang event tombol Detail
+     */
+
+    document
+        .querySelectorAll(".detail-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const tentorKode =
+                        button.dataset.tentorKode;
+
+                    const tentorNama =
+                        button.dataset.tentorNama;
+
+                    openDetail(
+                        tentorKode,
+                        tentorNama
+                    );
+
+                }
+            );
+
+        });
 }
 
 
-// ======================================================
-// PERIODE LABEL
-// ======================================================
+// =========================================================
+// FETCH DETAIL TENTOR
+// =========================================================
 
-function updatePeriodeLabel(startDate, endDate) {
+async function fetchDetailData(
+    tentorKode,
+    startDate,
+    endDate
+) {
+
+    console.log(
+        "Calling laporan_fee_tentor_detail:",
+        tentorKode,
+        startDate,
+        endDate
+    );
+
+
+    /*
+     * Nama parameter mengikuti
+     * function Supabase yang kita buat:
+     *
+     * p_tanggal_awal
+     * p_tanggal_akhir
+     * p_tentor_kode
+     */
+
+    const {
+        data,
+        error
+    } = await supabaseClient.rpc(
+        "laporan_fee_tentor_detail",
+        {
+            p_tanggal_awal:
+                startDate,
+
+            p_tanggal_akhir:
+                endDate,
+
+            p_tentor_kode:
+                tentorKode
+        }
+    );
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    console.log(
+        "Response detail:",
+        data
+    );
+
+
+    return Array.isArray(data)
+        ? data
+        : [];
+}
+
+
+// =========================================================
+// OPEN DETAIL
+// =========================================================
+
+async function openDetail(
+    tentorKode,
+    tentorNama
+) {
+
+    const startDate =
+        tanggalAwalInput.value;
+
+    const endDate =
+        tanggalAkhirInput.value;
+
+
+    modalTitle.textContent =
+        `Detail Fee - ${tentorNama}`;
+
+
+    modalSubtitle.textContent =
+        `Kode Tentor: ${tentorKode} • ${formatDate(startDate)} s/d ${formatDate(endDate)}`;
+
+
+    detailTableBody.innerHTML = `
+        <tr>
+            <td
+                colspan="8"
+                style="
+                    text-align:center;
+                    padding:30px;
+                    color:var(--muted);
+                "
+            >
+                Memuat detail...
+            </td>
+        </tr>
+    `;
+
+
+    detailTotal.textContent =
+        formatRupiah(0);
+
+
+    detailModal.classList.add("show");
+
+
+    try {
+
+        const rows =
+            await fetchDetailData(
+                tentorKode,
+                startDate,
+                endDate
+            );
+
+
+        renderDetailRows(rows);
+
+    } catch (error) {
+
+        console.error(
+            "Gagal memuat detail:",
+            error
+        );
+
+
+        detailTableBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="8"
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:var(--danger);
+                    "
+                >
+                    Gagal memuat detail:
+                    ${escapeHtml(
+                        error?.message ||
+                        "Terjadi kesalahan."
+                    )}
+                </td>
+            </tr>
+        `;
+
+        detailTotal.textContent =
+            formatRupiah(0);
+    }
+}
+
+
+// =========================================================
+// RENDER DETAIL
+// =========================================================
+
+function renderDetailRows(rows) {
+
+    if (!rows.length) {
+
+        detailTableBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="8"
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:var(--muted);
+                    "
+                >
+                    Tidak ada detail fee pada periode ini.
+                </td>
+            </tr>
+        `;
+
+        detailTotal.textContent =
+            formatRupiah(0);
+
+        return;
+    }
+
+
+    let total =
+        0;
+
+
+    detailTableBody.innerHTML =
+        rows
+            .map(
+                (row, index) => {
+
+                    const fee =
+                        Number(
+                            row.fee || 0
+                        );
+
+
+                    total += fee;
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${index + 1}
+                            </td>
+
+                            <td>
+                                ${formatDate(
+                                    row.tanggal
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    row.jenis_bimbingan ||
+                                    "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    row.kode ||
+                                    "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    row.siswa ||
+                                    "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    row.keterangan ||
+                                    "-"
+                                )}
+                            </td>
+
+                            <td class="fee-cell">
+                                ${formatRupiah(
+                                    fee
+                                )}
+                            </td>
+
+                            <td>
+                                <span class="type-badge">
+                                    ${escapeHtml(
+                                        row.tipe ||
+                                        "fee"
+                                    )}
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+                }
+            )
+            .join("");
+
+
+    detailTotal.textContent =
+        formatRupiah(total);
+}
+
+
+// =========================================================
+// CLOSE MODAL
+// =========================================================
+
+function closeModal() {
+
+    detailModal.classList.remove(
+        "show"
+    );
+}
+
+closeModalButton.addEventListener(
+    "click",
+    closeModal
+);
+
+
+// Klik area luar modal
+
+detailModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            detailModal
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+// ESC
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            detailModal.classList.contains("show")
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// UPDATE PERIODE
+// =========================================================
+
+function updatePeriodeLabel(
+    startDate,
+    endDate
+) {
 
     periodeLabel.textContent =
         `Periode: ${formatDate(startDate)} sampai ${formatDate(endDate)}`;
 }
 
 
-// ======================================================
+// =========================================================
 // LOAD REPORT
-// ======================================================
+// =========================================================
 
 async function loadReport() {
 
@@ -620,10 +1105,6 @@ async function loadReport() {
     const endDate =
         tanggalAkhirInput.value;
 
-
-    // ==================================================
-    // VALIDASI TANGGAL
-    // ==================================================
 
     if (!startDate || !endDate) {
 
@@ -649,14 +1130,15 @@ async function loadReport() {
 
     try {
 
-        // ==================================================
-        // CEK SESSION
-        // ==================================================
+        /*
+         * Pastikan user sudah login.
+         */
 
         const {
-            data: { session },
+            data: sessionData,
             error: sessionError
-        } = await supabaseClient.auth.getSession();
+        } =
+            await supabaseClient.auth.getSession();
 
 
         if (sessionError) {
@@ -664,7 +1146,7 @@ async function loadReport() {
         }
 
 
-        if (!session) {
+        if (!sessionData.session) {
 
             window.location.href =
                 "index.html";
@@ -673,10 +1155,6 @@ async function loadReport() {
         }
 
 
-        // ==================================================
-        // AMBIL DATA
-        // ==================================================
-
         const rows =
             await fetchReportData(
                 startDate,
@@ -684,26 +1162,8 @@ async function loadReport() {
             );
 
 
-        // ==================================================
-        // UPDATE LAST UPDATE
-        //
-        // Harus dilakukan sebelum / sesudah render
-        // tidak masalah.
-        // ==================================================
-
-        updateLastUpdate(rows);
-
-
-        // ==================================================
-        // RENDER DATA
-        // ==================================================
-
         renderRows(rows);
 
-
-        // ==================================================
-        // UPDATE PERIODE
-        // ==================================================
 
         updatePeriodeLabel(
             startDate,
@@ -724,51 +1184,46 @@ async function loadReport() {
             "Terjadi kesalahan saat memuat laporan.";
 
 
-        if (lastUpdateLabel) {
-
-            lastUpdateLabel.textContent =
-                "Last update: gagal mengambil data";
-        }
-
-
         renderEmptyState();
     }
 }
 
 
-// ======================================================
-// FILTER SUBMIT
-// ======================================================
+// =========================================================
+// FILTER
+// =========================================================
 
 filterForm.addEventListener(
     "submit",
-    async (event) => {
+    async event => {
 
         event.preventDefault();
 
         await loadReport();
+
     }
 );
 
 
-// ======================================================
+// =========================================================
 // RESET
-// ======================================================
+// =========================================================
 
 resetFilterButton.addEventListener(
     "click",
-    () => {
+    async () => {
 
         setDefaultRange();
 
-        loadReport();
+        await loadReport();
+
     }
 );
 
 
-// ======================================================
-// INITIAL LOAD
-// ======================================================
+// =========================================================
+// START
+// =========================================================
 
 setDefaultRange();
 
