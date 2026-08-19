@@ -602,6 +602,18 @@ a {
     color: var(--muted);
 }
 
+.last-update-label {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.last-update-label::before {
+    content: "●";
+    color: var(--green);
+    margin-right: 6px;
+}
 
 /* =========================
    TOTAL FEE
@@ -943,7 +955,6 @@ a {
             0 12px 30px;
     }
 }
-
 
 @media (max-width: 480px) {
 
