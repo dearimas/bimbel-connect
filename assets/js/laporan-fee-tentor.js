@@ -6,14 +6,25 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+// ======================================================
+// ELEMENT
+// ======================================================
+
 const filterForm = document.getElementById("filterForm");
 const tanggalAwalInput = document.getElementById("tanggalAwal");
 const tanggalAkhirInput = document.getElementById("tanggalAkhir");
 const resetFilterButton = document.getElementById("resetFilter");
+
 const reportContainer = document.getElementById("reportContainer");
 const totalFeetentorEl = document.getElementById("totalFeetentor");
-const periodeLabel = document.getElementById("periodeLabel");
 
+const periodeLabel = document.getElementById("periodeLabel");
+const lastUpdateLabel = document.getElementById("lastUpdateLabel");
+
+
+// ======================================================
+// FORMAT RUPIAH
+// ======================================================
 
 function formatRupiah(value) {
     const nominal = Number(value) || 0;
@@ -25,6 +36,10 @@ function formatRupiah(value) {
     }).format(nominal);
 }
 
+
+// ======================================================
+// FORMAT TANGGAL
+// ======================================================
 
 function formatDate(value) {
     if (!value) return "-";
@@ -42,6 +57,34 @@ function formatDate(value) {
     }).format(date);
 }
 
+
+// ======================================================
+// FORMAT TANGGAL + JAM
+// Untuk Last Update
+// ======================================================
+
+function formatDateTime(value) {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
+}
+
+
+// ======================================================
+// DEFAULT PERIODE
+// ======================================================
 
 function setDefaultRange() {
     const now = new Date();
@@ -71,6 +114,21 @@ function setDefaultRange() {
 }
 
 
+// ======================================================
+// RESET LAST UPDATE
+// ======================================================
+
+function resetLastUpdate() {
+    if (lastUpdateLabel) {
+        lastUpdateLabel.textContent = "Last update: -";
+    }
+}
+
+
+// ======================================================
+// EMPTY STATE
+// ======================================================
+
 function renderEmptyState() {
     reportContainer.innerHTML = `
         <div class="empty-state">
@@ -80,8 +138,14 @@ function renderEmptyState() {
     `;
 
     totalFeetentorEl.textContent = formatRupiah(0);
+
+    resetLastUpdate();
 }
 
+
+// ======================================================
+// FETCH LAPORAN DARI SUPABASE
+// ======================================================
 
 async function fetchReportData(startDate, endDate) {
 
@@ -107,24 +171,27 @@ async function fetchReportData(startDate, endDate) {
 }
 
 
-/*
- * Group data berdasarkan tentor.
- *
- * Contoh data dari RPC:
- *
- * T36 | Dimas | Coding - SD 4 | fee 100.000
- * T36 | Dimas | Reguler - SD 4 | fee 150.000
- * T11 | Indah | Privat - SD 2 | fee 50.000
- *
- * Akan menjadi:
- *
- * T36
- *   - Coding
- *   - Reguler
- *
- * T11
- *   - Privat
- */
+// ======================================================
+// GROUP DATA BERDASARKAN TENTOR
+//
+// Satu tentor = satu card.
+//
+// Contoh:
+//
+// T36 | Dimas | Coding - SD 4 | fee 100.000
+// T36 | Dimas | Reguler - SD 4 | fee 150.000
+// T11 | Indah | Privat - SD 2 | fee 50.000
+//
+// Menjadi:
+//
+// T36
+//   Coding
+//   Reguler
+//
+// T11
+//   Privat
+// ======================================================
+
 function groupByTentor(rows) {
 
     const grouped = {};
@@ -138,216 +205,401 @@ function groupByTentor(rows) {
             grouped[kode] = {
                 tentor_kode: row.tentor_kode,
                 tentor: row.tentor,
+
                 total_fee: 0,
                 total_kbm: 0,
                 total_jam_kosong: 0,
                 total_mengajar: 0,
+
                 details: [],
             };
         }
 
-        const fee = Number(row.fee || 0);
-        const totalKbm = Number(row.total_kbm || 0);
-        const jamKosong = Number(row.total_jam_kosong || 0);
-        const mengajar = Number(row.total_mengajar || 0);
 
-        /*
-         * PENTING:
-         * Jangan pakai row.total_fee_tentor.
-         *
-         * Karena nilai tersebut bisa muncul
-         * berulang di setiap jenis bimbingan.
-         *
-         * Kita jumlahkan fee masing-masing row.
-         */
+        const fee = Number(row.fee || 0);
+
+        const totalKbm =
+            Number(row.total_kbm || 0);
+
+        const jamKosong =
+            Number(row.total_jam_kosong || 0);
+
+        const mengajar =
+            Number(row.total_mengajar || 0);
+
+
+        // ==================================================
+        // TOTAL FEE TENTOR
+        //
+        // Jangan menggunakan row.total_fee_tentor.
+        //
+        // Karena total_fee_tentor berasal dari window
+        // function dan nilainya dapat muncul berulang
+        // pada setiap jenis bimbingan.
+        //
+        // Kita cukup jumlahkan fee setiap detail.
+        // ==================================================
+
         grouped[kode].total_fee += fee;
 
         grouped[kode].total_kbm += totalKbm;
+
         grouped[kode].total_jam_kosong += jamKosong;
+
         grouped[kode].total_mengajar += mengajar;
 
+
         grouped[kode].details.push({
-            jenis_bimbingan: row.jenis_bimbingan || "-",
-            tingkat: row.tingkat || "-",
-            total_kbm: totalKbm,
-            total_jam_kosong: jamKosong,
-            total_mengajar: mengajar,
-            fee: fee,
+
+            jenis_bimbingan:
+                row.jenis_bimbingan || "-",
+
+            tingkat:
+                row.tingkat || "-",
+
+            total_kbm:
+                totalKbm,
+
+            total_jam_kosong:
+                jamKosong,
+
+            total_mengajar:
+                mengajar,
+
+            fee:
+                fee,
         });
     });
+
 
     return Object.values(grouped);
 }
 
 
-function renderRows(rows) {
+// ======================================================
+// UPDATE LAST UPDATE
+// ======================================================
+//
+// last_update berasal dari FUNCTION Supabase.
+//
+// Karena function mengambil MAX(created_at) dari KBM
+// pada periode yang dipilih, maka cukup mengambil
+// nilai last_update dari salah satu row.
+//
+// Jika function mengembalikan nilai yang sama untuk
+// setiap row, hasilnya tetap konsisten.
+// ======================================================
 
-    if (!rows.length) {
-        renderEmptyState();
+function updateLastUpdate(rows) {
+
+    if (!lastUpdateLabel) {
         return;
     }
 
-    const tentorList = groupByTentor(rows);
+    if (!rows.length) {
+        lastUpdateLabel.textContent =
+            "Last update: Belum ada data";
 
-    /*
-     * Total seluruh fee.
-     */
-    const grandTotal = tentorList.reduce(
-        (sum, tentor) => sum + tentor.total_fee,
-        0
+        return;
+    }
+
+
+    const lastUpdates = rows
+        .map((row) => row.last_update)
+        .filter(Boolean)
+        .map((value) => new Date(value))
+        .filter((date) => !Number.isNaN(date.getTime()));
+
+
+    if (!lastUpdates.length) {
+
+        lastUpdateLabel.textContent =
+            "Last update: -";
+
+        return;
+    }
+
+
+    // Ambil tanggal paling baru dari seluruh row.
+    const latest = new Date(
+        Math.max(
+            ...lastUpdates.map(
+                (date) => date.getTime()
+            )
+        )
     );
 
-    totalFeetentorEl.textContent = formatRupiah(grandTotal);
 
-
-    reportContainer.innerHTML = tentorList
-        .map((tentor) => {
-
-            return `
-                <div class="tentor-card">
-
-                    <!-- HEADER TENTOR -->
-                    <div class="tentor-card-header">
-
-                        <div class="tentor-profile">
-
-                            <div class="tentor-avatar">
-                                👨‍🏫
-                            </div>
-
-                            <div>
-                                <div class="tentor-name">
-                                    ${tentor.tentor || "-"}
-                                </div>
-
-                                <div class="tentor-code">
-                                    Kode Tentor: ${tentor.tentor_kode || "-"}
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-
-                    <!-- SUMMARY -->
-                    <div class="tentor-summary">
-
-                        <div class="summary-item">
-                            <span>Total KBM</span>
-                            <strong>
-                                ${tentor.total_kbm}
-                            </strong>
-                        </div>
-
-                        <div class="summary-item">
-                            <span>Jam Efektif</span>
-                            <strong>
-                                ${tentor.total_mengajar}
-                            </strong>
-                        </div>
-
-                        <div class="summary-item">
-                            <span>Jam Kosong</span>
-                            <strong>
-                                ${tentor.total_jam_kosong}
-                            </strong>
-                        </div>
-
-                        <div class="summary-item fee-summary">
-                            <span>Perolehan</span>
-                            <strong>
-                                ${formatRupiah(tentor.total_fee)}
-                            </strong>
-                        </div>
-
-                    </div>
-
-
-                    <!-- DETAIL -->
-                    <div class="tentor-detail">
-
-                        <div class="detail-title">
-                            <span>Detail Bimbingan</span>
-                            <span>${tentor.details.length} jenis</span>
-                        </div>
-
-
-                        <div class="detail-table">
-
-                            <div class="detail-row detail-head">
-
-                                <div>
-                                    Jenis Bimbingan
-                                </div>
-
-                                <div>
-                                    KBM
-                                </div>
-
-                                <div>
-                                    Kosong
-                                </div>
-
-                                <div>
-                                    Efektif
-                                </div>
-
-                                <div>
-                                    Fee
-                                </div>
-
-                            </div>
-
-
-                            ${tentor.details
-                                .map((detail) => {
-
-                                    return `
-                                        <div class="detail-row">
-
-                                            <div class="jenis-bimbingan">
-                                                <strong>
-                                                    ${detail.jenis_bimbingan}
-                                                </strong>
-
-                                                <small>
-                                                    ${detail.tingkat}
-                                                </small>
-                                            </div>
-
-                                            <div>
-                                                ${detail.total_kbm}
-                                            </div>
-
-                                            <div>
-                                                ${detail.total_jam_kosong}
-                                            </div>
-
-                                            <div>
-                                                ${detail.total_mengajar}
-                                            </div>
-
-                                            <div class="detail-fee">
-                                                ${formatRupiah(detail.fee)}
-                                            </div>
-
-                                        </div>
-                                    `;
-
-                                })
-                                .join("")}
-
-                        </div>
-
-                    </div>
-
-                </div>
-            `;
-
-        })
-        .join("");
+    lastUpdateLabel.textContent =
+        `Last update: ${formatDateTime(latest)}`;
 }
 
+
+// ======================================================
+// RENDER CARD TENTOR
+// ======================================================
+
+function renderRows(rows) {
+
+    if (!rows.length) {
+
+        renderEmptyState();
+
+        return;
+    }
+
+
+    const tentorList =
+        groupByTentor(rows);
+
+
+    // ==================================================
+    // GRAND TOTAL SELURUH TENTOR
+    // ==================================================
+
+    const grandTotal =
+        tentorList.reduce(
+            (sum, tentor) =>
+                sum + tentor.total_fee,
+            0
+        );
+
+
+    totalFeetentorEl.textContent =
+        formatRupiah(grandTotal);
+
+
+    // ==================================================
+    // RENDER CARD
+    // ==================================================
+
+    reportContainer.innerHTML =
+        tentorList
+            .map((tentor) => {
+
+                return `
+                    <div class="tentor-card">
+
+                        <!-- ==================================
+                             HEADER TENTOR
+                        =================================== -->
+
+                        <div class="tentor-card-header">
+
+                            <div class="tentor-profile">
+
+                                <div class="tentor-avatar">
+                                    👨‍🏫
+                                </div>
+
+                                <div>
+
+                                    <div class="tentor-name">
+                                        ${tentor.tentor || "-"}
+                                    </div>
+
+                                    <div class="tentor-code">
+                                        Kode Tentor:
+                                        ${tentor.tentor_kode || "-"}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- TOTAL FEE TENTOR -->
+
+                            <div class="tentor-total-fee">
+
+                                <span>
+                                    Total Fee
+                                </span>
+
+                                <strong>
+                                    ${formatRupiah(
+                                        tentor.total_fee
+                                    )}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ==================================
+                             SUMMARY
+                        =================================== -->
+
+                        <div class="tentor-summary">
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Total KBM
+                                </span>
+
+                                <strong>
+                                    ${tentor.total_kbm}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Jam Efektif
+                                </span>
+
+                                <strong>
+                                    ${tentor.total_mengajar}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Jam Kosong
+                                </span>
+
+                                <strong>
+                                    ${tentor.total_jam_kosong}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item fee-summary">
+
+                                <span>
+                                    Perolehan
+                                </span>
+
+                                <strong>
+                                    ${formatRupiah(
+                                        tentor.total_fee
+                                    )}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ==================================
+                             DETAIL BIMBINGAN
+                        =================================== -->
+
+                        <div class="tentor-detail">
+
+                            <div class="detail-title">
+
+                                <span>
+                                    Detail Bimbingan
+                                </span>
+
+                                <span>
+                                    ${tentor.details.length} jenis
+                                </span>
+
+                            </div>
+
+
+                            <div class="detail-table">
+
+                                <!-- HEADER -->
+
+                                <div class="detail-row detail-head">
+
+                                    <div>
+                                        Jenis Bimbingan
+                                    </div>
+
+                                    <div>
+                                        KBM
+                                    </div>
+
+                                    <div>
+                                        Kosong
+                                    </div>
+
+                                    <div>
+                                        Efektif
+                                    </div>
+
+                                    <div>
+                                        Fee
+                                    </div>
+
+                                </div>
+
+
+                                <!-- DETAIL -->
+
+                                ${tentor.details
+                                    .map((detail) => {
+
+                                        return `
+                                            <div class="detail-row">
+
+                                                <div class="jenis-bimbingan">
+
+                                                    <strong>
+                                                        ${detail.jenis_bimbingan}
+                                                    </strong>
+
+                                                    <small>
+                                                        ${detail.tingkat}
+                                                    </small>
+
+                                                </div>
+
+
+                                                <div>
+                                                    ${detail.total_kbm}
+                                                </div>
+
+
+                                                <div>
+                                                    ${detail.total_jam_kosong}
+                                                </div>
+
+
+                                                <div>
+                                                    ${detail.total_mengajar}
+                                                </div>
+
+
+                                                <div class="detail-fee">
+                                                    ${formatRupiah(
+                                                        detail.fee
+                                                    )}
+                                                </div>
+
+                                            </div>
+                                        `;
+
+                                    })
+                                    .join("")}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+
+            })
+            .join("");
+}
+
+
+// ======================================================
+// PERIODE LABEL
+// ======================================================
 
 function updatePeriodeLabel(startDate, endDate) {
 
@@ -356,11 +608,22 @@ function updatePeriodeLabel(startDate, endDate) {
 }
 
 
+// ======================================================
+// LOAD REPORT
+// ======================================================
+
 async function loadReport() {
 
-    const startDate = tanggalAwalInput.value;
-    const endDate = tanggalAkhirInput.value;
+    const startDate =
+        tanggalAwalInput.value;
 
+    const endDate =
+        tanggalAkhirInput.value;
+
+
+    // ==================================================
+    // VALIDASI TANGGAL
+    // ==================================================
 
     if (!startDate || !endDate) {
 
@@ -386,6 +649,10 @@ async function loadReport() {
 
     try {
 
+        // ==================================================
+        // CEK SESSION
+        // ==================================================
+
         const {
             data: { session },
             error: sessionError
@@ -399,19 +666,44 @@ async function loadReport() {
 
         if (!session) {
 
-            window.location.href = "index.html";
+            window.location.href =
+                "index.html";
 
             return;
         }
 
 
-        const rows = await fetchReportData(
-            startDate,
-            endDate
-        );
+        // ==================================================
+        // AMBIL DATA
+        // ==================================================
 
+        const rows =
+            await fetchReportData(
+                startDate,
+                endDate
+            );
+
+
+        // ==================================================
+        // UPDATE LAST UPDATE
+        //
+        // Harus dilakukan sebelum / sesudah render
+        // tidak masalah.
+        // ==================================================
+
+        updateLastUpdate(rows);
+
+
+        // ==================================================
+        // RENDER DATA
+        // ==================================================
 
         renderRows(rows);
+
+
+        // ==================================================
+        // UPDATE PERIODE
+        // ==================================================
 
         updatePeriodeLabel(
             startDate,
@@ -426,14 +718,27 @@ async function loadReport() {
             error
         );
 
+
         periodeLabel.textContent =
             error?.message ||
             "Terjadi kesalahan saat memuat laporan.";
+
+
+        if (lastUpdateLabel) {
+
+            lastUpdateLabel.textContent =
+                "Last update: gagal mengambil data";
+        }
+
 
         renderEmptyState();
     }
 }
 
+
+// ======================================================
+// FILTER SUBMIT
+// ======================================================
 
 filterForm.addEventListener(
     "submit",
@@ -446,6 +751,10 @@ filterForm.addEventListener(
 );
 
 
+// ======================================================
+// RESET
+// ======================================================
+
 resetFilterButton.addEventListener(
     "click",
     () => {
@@ -456,6 +765,10 @@ resetFilterButton.addEventListener(
     }
 );
 
+
+// ======================================================
+// INITIAL LOAD
+// ======================================================
 
 setDefaultRange();
 
