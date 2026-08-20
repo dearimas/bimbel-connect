@@ -179,7 +179,7 @@ async function loadReport(token) {
             "cek_laporan_fee_public",
             {
                 p_token:
-                    token
+                    token.trim()
             }
         );
 
