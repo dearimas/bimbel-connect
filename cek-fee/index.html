@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cek Fee Tentor - Bimbel Connect</title>
+
+    <link rel="icon" type="image/x-icon" href="../icon.ico">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <main class="page">
+
+        <section class="hero">
+
+            <div class="brand">
+                <img src="../icon.ico" alt="Bimbel Connect">
+                <span>Bimbingan Belajar Connect</span>
+            </div>
+
+            <div class="hero-icon">
+                👨‍🏫
+            </div>
+
+            <h1>Cek Fee Tentor</h1>
+
+            <p>
+                Masukkan token laporan yang diberikan oleh admin
+                untuk melihat rincian fee Anda.
+            </p>
+
+        </section>
+
+
+        <section class="lookup-card">
+
+            <div class="card-title">
+                <span>🔐</span>
+
+                <div>
+                    <h2>Akses Laporan</h2>
+                    <p>Token bersifat pribadi untuk laporan Anda.</p>
+                </div>
+            </div>
+
+
+            <form id="lookupForm">
+
+                <label for="token">
+                    Token Laporan
+                </label>
+
+                <input
+                    type="text"
+                    id="token"
+                    name="token"
+                    placeholder="Contoh: A3F91C82D7B4"
+                    autocomplete="off"
+                    autocapitalize="characters"
+                    spellcheck="false"
+                    required
+                >
+
+                <button type="submit" id="lookupButton">
+                    <span id="buttonText">Lihat Laporan</span>
+                    <span id="buttonLoading" class="hidden">
+                        Memuat...
+                    </span>
+                </button>
+
+            </form>
+
+
+            <div id="errorMessage" class="error-message hidden"></div>
+
+        </section>
+
+
+        <section id="reportSection" class="report-section hidden">
+
+            <div class="report-header">
+
+                <div>
+                    <div class="eyebrow">
+                        LAPORAN FEE
+                    </div>
+
+                    <h2 id="tentorName">-</h2>
+
+                    <p id="periodeLabel">
+                        -
+                    </p>
+                </div>
+
+                <div class="total-box">
+                    <span>Total Fee</span>
+                    <strong id="totalFee">
+                        Rp 0
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="summary-grid">
+
+                <div class="summary-item">
+                    <span>Total Data</span>
+                    <strong id="totalData">0</strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>KBM</span>
+                    <strong id="totalKbm">0</strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Bonus / Lainnya</span>
+                    <strong id="totalBonus">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="detail-card">
+
+                <div class="detail-heading">
+
+                    <div>
+                        <h3>Rincian Fee</h3>
+                        <p>Detail transaksi pada periode laporan.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th>Kode</th>
+                                <th>Siswa</th>
+                                <th>Keterangan</th>
+                                <th>Fee</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="reportBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+            Bimbingan Belajar Connect
+        </footer>
+
+    </main>
+
+
+    <script src="./script.js"></script>
+
+</body>
+
+</html>
