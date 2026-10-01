@@ -306,6 +306,9 @@ function renderReport(rows) {
                 const keterangan =
                     row.keterangan || "-";
 
+                const materi =
+                    row.materi || "-";
+
 
                 return `
 
@@ -351,6 +354,11 @@ function renderReport(rows) {
                             )}
                         </td>
 
+                        <td>
+                            ${escapeHtml(
+                                materi
+                            )}
+                        </td>
                     </tr>
 
                 `;
