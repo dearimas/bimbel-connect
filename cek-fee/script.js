@@ -53,6 +53,9 @@ const totalBonus =
 const reportBody =
     document.getElementById("reportBody");
 
+const lastDataAt =
+    document.getElementById("lastDataAt");
+
 
 /* =====================================================
    FORMAT
