@@ -304,8 +304,8 @@ function renderReport(rows, lastData) {
     if (lastDataAt) { 
         lastDataAt.textContent =
             lastData 
-            ? formatDateTime(lastData) 
-            : "-"; 
+            ? 'Last update data : ${formatDateTime(lastData)}`
+            : "Last update data : -"; 
     }
 
 
