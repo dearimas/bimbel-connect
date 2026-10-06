@@ -172,28 +172,51 @@ async function loadReport(token) {
         );
 
 
-        const {
-            data,
-            error
-        } = await supabaseClient.rpc(
-            "cek_laporan_fee_public",
-            {
-                p_token:
-                    token.trim()
-            }
-        );
+        const [ 
+            reportResult, lastUpdateResult 
+        ] = await Promise.all([ 
+            
+            supabaseClient.rpc( 
+                "cek_laporan_fee_public", 
+                { 
+                    p_token: token.trim() 
+                } 
+            ), 
+            
+            supabaseClient.rpc( 
+                "cek_laporan_fee_last_update", 
+                {
+                    p_token: token.trim() 
+                } 
+            ) 
+        ]);
+
+        const { 
+            data, error 
+        } = reportResult; 
+        
+        const { 
+            data: lastData, error: lastUpdateError 
+        } = lastUpdateResult;
 
 
         if (error) {
             throw error;
         }
 
+        if (lastUpdateError) { 
+            throw lastUpdateError; 
+        }
 
         console.log(
             "Response:",
             data
         );
 
+        console.log( 
+            "Last data:", 
+            lastData 
+        );
 
         if (
             !Array.isArray(data) ||
@@ -206,7 +229,7 @@ async function loadReport(token) {
         }
 
 
-        renderReport(data);
+        renderReport(data, lastData);
 
 
     } catch (error) {
@@ -232,7 +255,7 @@ async function loadReport(token) {
    RENDER
 ===================================================== */
 
-function renderReport(rows) {
+function renderReport(rows, lastData) {
 
     const first =
         rows[0];
@@ -248,6 +271,13 @@ function renderReport(rows) {
         )} sampai ${formatDate(
             first.tanggal_akhir
         )}`;
+
+    if (lastDataAt) { 
+        lastDataAt.textContent =
+            lastData 
+            ? formatDateTime(lastData) 
+            : "-"; 
+    }
 
 
     const total =
