@@ -153,6 +153,32 @@ function setLoading(loading) {
     }
 }
 
+function formatDateTime(value) { 
+    if (!value) { 
+        return "-"; 
+    } 
+    
+    const date = 
+        new Date(value); 
+    
+    if (Number.isNaN(date.getTime())) { 
+        return value; 
+    }
+    
+    return new Intl.DateTimeFormat( 
+        "id-ID", 
+        { 
+            day: "2-digit", 
+            month: "long", 
+            year: "numeric", 
+            hour: "2-digit", 
+            minute: "2-digit", 
+            second: "2-digit", 
+            timeZone: "Asia/Jakarta",
+            timeZoneName: "short" 
+        } 
+    ).format(date); 
+}
 
 /* =====================================================
    LOAD REPORT
