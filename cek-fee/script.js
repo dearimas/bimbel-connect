@@ -368,10 +368,37 @@ function renderReport(rows, lastData) {
                 const materi =
                     row.materi || "-";
 
-
+                const jenisBimbingan = 
+                    String(
+                        row.jenis_bimbingan || ""
+                    ) 
+                    .trim() 
+                    .toLowerCase(); 
+                
+                const keteranganText = 
+                    String(
+                        keterangan || ""
+                    ) 
+                    .toLowerCase(); 
+                
+                let rowClass = ""; 
+                
+                if (keteranganText.includes("jam kosong")) { 
+                    rowClass = 
+                        "row-jam-kosong"; 
+                } else if (jenisBimbingan === "fee") { 
+                    rowClass = 
+                        "row-fee"; 
+                } else if ( jenisBimbingan === "reimbursement" || jenisBimbingan === "transport" ) { 
+                    rowClass = 
+                        jenisBimbingan === "transport" ? "row-transport" : "row-reimbursement"; 
+                } else if (jenisBimbingan === "bonus") { 
+                    rowClass = "row-bonus"; 
+                }
+                
                 return `
 
-                    <tr>
+                    <tr class="${rowClass}">
 
                         <td>
                             ${index + 1}
