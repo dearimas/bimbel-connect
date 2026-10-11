@@ -519,3 +519,23 @@ footer {
     }
 
 }
+
+/* =========================
+   Warna pastel untuk setiap jenis baris
+========================= */
+.row-fee {
+    background-color: #FCE7F3 !important;
+}
+
+.row-reimbursement,
+.row-transport {
+    background-color: #DBEAFE !important;
+}
+
+.row-bonus {
+    background-color: #DCFCE7 !important;
+}
+
+.row-jam-kosong {
+    background-color: #FEF3C7 !important;
+}
