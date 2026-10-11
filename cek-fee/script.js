@@ -392,10 +392,10 @@ function renderReport(rows, lastData) {
                 } else if (jenisBimbingan.startsWith("Reimbursement")) { 
                     rowClass = 
                         "row-reimbursement"; 
-                } else if (jenisBimbingan.startsWith("transport")) { 
+                } else if (jenisBimbingan.startsWith("Transport")) { 
                     rowClass = 
                         "row-transport"; 
-                } else if (jenisBimbinganstartsWith("bonus")) { 
+                } else if (jenisBimbingan.startsWith("Bonus")) { 
                     rowClass = 
                         "row-bonus"; 
                 }
