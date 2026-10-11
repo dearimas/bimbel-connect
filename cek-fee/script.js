@@ -383,17 +383,21 @@ function renderReport(rows, lastData) {
                 
                 let rowClass = ""; 
                 
-                if (keteranganText.includes("jam kosong")) { 
+                if (keteranganText.includes("Jam Kosong")) { 
                     rowClass = 
                         "row-jam-kosong"; 
-                } else if (jenisBimbingan === "fee") { 
+                } else if (jenisBimbingan.startsWith("Fee")) { 
                     rowClass = 
                         "row-fee"; 
-                } else if ( jenisBimbingan === "reimbursement" || jenisBimbingan === "transport" ) { 
+                } else if (jenisBimbingan.startsWith("Reimbursement")) { 
                     rowClass = 
-                        jenisBimbingan === "transport" ? "row-transport" : "row-reimbursement"; 
-                } else if (jenisBimbingan === "bonus") { 
-                    rowClass = "row-bonus"; 
+                        "row-reimbursement"; 
+                } else if (jenisBimbingan.startsWith("transport")) { 
+                    rowClass = 
+                        "row-transport"; 
+                } else if (jenisBimbinganstartsWith("bonus")) { 
+                    rowClass = 
+                        "row-bonus"; 
                 }
                 
                 return `
